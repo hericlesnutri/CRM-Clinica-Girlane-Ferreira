@@ -145,3 +145,64 @@ export async function createQuickOpportunity(
   revalidatePath(`/crm/pacientes/${patientId}`);
   redirect("/crm/atendimento?salvo=oportunidade");
 }
+
+export async function createPostProcedureFollowUp(
+  _previousState: QuickActionState,
+  formData: FormData,
+): Promise<QuickActionState> {
+  const patientId = String(formData.get("patient_id") ?? "").trim();
+  const procedureName = String(formData.get("procedure_name") ?? "").trim();
+  const performedAt = String(formData.get("performed_at") ?? "").trim();
+  const nextContactAt = String(formData.get("next_contact_at") ?? "").trim();
+  const notes = String(formData.get("notes") ?? "").trim();
+
+  if (!patientId || !procedureName || !nextContactAt) {
+    return {
+      message: "Selecione o paciente, informe o procedimento e agende o retorno.",
+    };
+  }
+
+  const { supabase, user } = await requireUser();
+
+  const { error: procedureError } = await supabase.from("patient_procedures").insert({
+    patient_id: patientId,
+    procedure_name: procedureName,
+    performed_at: performedAt || null,
+    notes: notes || null,
+  });
+
+  if (procedureError) {
+    return { message: "Nao foi possivel registrar o procedimento realizado." };
+  }
+
+  const summary = [
+    `Acompanhamento pos-procedimento: ${procedureName}.`,
+    performedAt
+      ? `Procedimento realizado em ${new Date(performedAt).toLocaleDateString("pt-BR")}.`
+      : null,
+    notes || null,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const { error: contactError } = await supabase.from("contact_logs").insert({
+    patient_id: patientId,
+    contacted_by: user.id,
+    channel: "Pos-procedimento",
+    return_type: "pos_procedimento",
+    summary,
+    waiting_patient_response: false,
+    next_action: `Acompanhar pos-procedimento: ${procedureName}`,
+    next_contact_at: new Date(nextContactAt).toISOString(),
+  });
+
+  if (contactError) {
+    return { message: "Procedimento salvo, mas nao foi possivel agendar o retorno." };
+  }
+
+  revalidatePath("/crm");
+  revalidatePath("/crm/agenda");
+  revalidatePath("/crm/atendimento");
+  revalidatePath(`/crm/pacientes/${patientId}`);
+  redirect("/crm/atendimento?salvo=pos_procedimento");
+}

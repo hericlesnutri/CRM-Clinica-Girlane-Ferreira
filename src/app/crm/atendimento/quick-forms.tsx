@@ -5,6 +5,7 @@ import {
   createQuickContact,
   createQuickOpportunity,
   createQuickPatient,
+  createPostProcedureFollowUp,
   type QuickActionState,
 } from "./actions";
 
@@ -30,6 +31,8 @@ export function QuickForms({ patients }: { patients: PatientOption[] }) {
     createQuickOpportunity,
     initialState,
   );
+  const [postProcedureState, postProcedureAction, isPostProcedurePending] =
+    useActionState(createPostProcedureFollowUp, initialState);
 
   return (
     <div className="grid gap-5">
@@ -82,7 +85,7 @@ export function QuickForms({ patients }: { patients: PatientOption[] }) {
       </form>
 
       {patients.length ? (
-        <div className="grid gap-5 xl:grid-cols-2">
+        <div className="grid gap-5 xl:grid-cols-3">
       <form action={contactAction} className="grid gap-4 rounded-lg border border-[#dfd7cc] bg-white p-5">
         <div>
           <h2 className="text-xl font-semibold">Registrar contato</h2>
@@ -215,6 +218,65 @@ export function QuickForms({ patients }: { patients: PatientOption[] }) {
 
         <button className={buttonClassName} disabled={isOpportunityPending} type="submit">
           {isOpportunityPending ? "Salvando..." : "Salvar oportunidade"}
+        </button>
+      </form>
+
+      <form action={postProcedureAction} className="grid gap-4 rounded-lg border border-emerald-300 bg-emerald-50 p-5">
+        <div>
+          <h2 className="text-xl font-semibold">Acompanhamento pos-procedimento</h2>
+          <p className="mt-1 text-sm text-[#496356]">
+            Para pacientes que ja realizaram procedimento e precisam de cuidado no pos.
+          </p>
+        </div>
+
+        <PatientSelect patients={patients} />
+
+        <label className="flex flex-col gap-2 text-sm font-medium">
+          Procedimento realizado
+          <input
+            className={fieldClassName}
+            name="procedure_name"
+            placeholder="Ex.: bioestimulador, preenchimento labial..."
+            required
+          />
+        </label>
+
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-1">
+          <label className="flex flex-col gap-2 text-sm font-medium">
+            Data do procedimento
+            <input className={fieldClassName} name="performed_at" type="date" />
+          </label>
+
+          <label className="flex flex-col gap-2 text-sm font-medium">
+            Quando retornar contato
+            <input
+              className={fieldClassName}
+              name="next_contact_at"
+              required
+              type="datetime-local"
+            />
+          </label>
+        </div>
+
+        <label className="flex flex-col gap-2 text-sm font-medium">
+          Observacoes do acompanhamento
+          <textarea
+            className={`${fieldClassName} min-h-28 py-3`}
+            name="notes"
+            placeholder="Orientacoes passadas, ponto de atencao, sensibilidade relatada..."
+          />
+        </label>
+
+        {postProcedureState.message ? (
+          <FormError message={postProcedureState.message} />
+        ) : null}
+
+        <button
+          className={buttonClassName}
+          disabled={isPostProcedurePending}
+          type="submit"
+        >
+          {isPostProcedurePending ? "Salvando..." : "Agendar pos-procedimento"}
         </button>
       </form>
         </div>
