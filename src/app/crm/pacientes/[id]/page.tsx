@@ -1,7 +1,5 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ContactForm } from "./contact-form";
-import { OpportunityForm } from "./opportunity-form";
 import { requireUser } from "@/lib/auth/require-user";
 
 type Patient = {
@@ -40,6 +38,13 @@ type Opportunity = {
   profiles: {
     full_name: string;
   } | null;
+};
+
+type PatientProcedure = {
+  procedure_name: string;
+  performed_at: string | null;
+  notes: string | null;
+  created_at: string;
 };
 
 const opportunityStatusLabels: Record<string, string> = {
@@ -83,6 +88,15 @@ export default async function PatientDetailsPage({
     .order("created_at", { ascending: false })
     .returns<ContactLog[]>();
 
+  const { data: latestProcedure } = await supabase
+    .from("patient_procedures")
+    .select("procedure_name, performed_at, notes, created_at")
+    .eq("patient_id", patient.id)
+    .order("performed_at", { ascending: false, nullsFirst: false })
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle<PatientProcedure>();
+
   const { data: opportunities } = await supabase
     .from("opportunities")
     .select(
@@ -121,6 +135,31 @@ export default async function PatientDetailsPage({
               />
             </div>
 
+            <div className="mt-5 rounded-lg border border-emerald-300 bg-emerald-50 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-900">
+                Ultimo procedimento
+              </p>
+              {latestProcedure ? (
+                <div className="mt-2">
+                  <p className="font-semibold">{latestProcedure.procedure_name}</p>
+                  <p className="mt-1 text-sm text-[#496356]">
+                    {latestProcedure.performed_at
+                      ? new Date(latestProcedure.performed_at).toLocaleDateString("pt-BR")
+                      : "Data nao informada"}
+                  </p>
+                  {latestProcedure.notes ? (
+                    <p className="mt-3 text-sm leading-6 text-[#496356]">
+                      {latestProcedure.notes}
+                    </p>
+                  ) : null}
+                </div>
+              ) : (
+                <p className="mt-2 text-sm text-[#496356]">
+                  Nenhum procedimento realizado registrado ainda.
+                </p>
+              )}
+            </div>
+
             {patient.notes ? (
               <p className="mt-5 rounded-lg bg-[#f5f3e7] p-4 text-sm leading-6 text-[#5d5248]">
                 {patient.notes}
@@ -128,11 +167,6 @@ export default async function PatientDetailsPage({
             ) : null}
           </div>
         </div>
-
-        <section>
-          <h2 className="mb-3 text-xl font-semibold">Nova oportunidade</h2>
-          <OpportunityForm patientId={patient.id} />
-        </section>
 
         <section className="rounded-lg border border-[#dfd7cc] bg-white">
           <div className="border-b border-[#dfd7cc] px-5 py-4">
@@ -199,11 +233,6 @@ export default async function PatientDetailsPage({
               Nenhuma oportunidade registrada para este paciente.
             </div>
           )}
-        </section>
-
-        <section>
-          <h2 className="mb-3 text-xl font-semibold">Novo contato</h2>
-          <ContactForm patientId={patient.id} />
         </section>
 
         <section className="rounded-lg border border-[#dfd7cc] bg-white">
