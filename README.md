@@ -72,7 +72,7 @@ acompanhar a recuperacao do paciente nos dias seguintes ao procedimento. A
 agenda mostra apenas o proximo lembrete pendente de cada sequencia.
 
 Na ficha do paciente, oportunidades e contatos tambem usam cores por funcao, e
-as conclusoes registradas na agenda aparecem destacadas no historico.
+as conclusoes/evolucoes registradas na agenda aparecem destacadas no historico.
 
 ## Vercel
 

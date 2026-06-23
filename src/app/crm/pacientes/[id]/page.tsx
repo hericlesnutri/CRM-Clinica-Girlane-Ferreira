@@ -176,56 +176,7 @@ export default async function PatientDetailsPage({
           {opportunities?.length ? (
             <div className="grid gap-3 bg-[#f8f6ee] p-3">
               {opportunities.map((opportunity) => (
-                <article
-                  key={opportunity.id}
-                  className="rounded-lg border border-amber-300 bg-amber-50 p-4"
-                >
-                  <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
-                    <div>
-                      <h3 className="font-semibold">{opportunity.suggested_procedure}</h3>
-                      <p className="mt-1 text-sm text-[#5d5248]">
-                        Criada em{" "}
-                        {new Date(opportunity.created_at).toLocaleString("pt-BR")} por{" "}
-                        {opportunity.profiles?.full_name ?? "Equipe"}
-                      </p>
-                    </div>
-                    <span className="w-fit rounded-full bg-amber-200 px-3 py-1 text-xs font-medium text-amber-900">
-                      {opportunityStatusLabels[opportunity.status] ?? opportunity.status}
-                    </span>
-                  </div>
-
-                  <div className="mt-4 grid gap-3 text-sm md:grid-cols-3">
-                    <InfoItem
-                      label="Valor"
-                      value={
-                        opportunity.proposed_value === null
-                          ? "Nao informado"
-                          : Number(opportunity.proposed_value).toLocaleString("pt-BR", {
-                              style: "currency",
-                              currency: "BRL",
-                            })
-                      }
-                    />
-                    <InfoItem
-                      label="Retorno previsto"
-                      value={
-                        opportunity.expected_return_at
-                          ? new Date(opportunity.expected_return_at).toLocaleString("pt-BR")
-                          : "Nao agendado"
-                      }
-                    />
-                    <InfoItem
-                      label="Responsavel"
-                      value={opportunity.profiles?.full_name ?? "Equipe"}
-                    />
-                  </div>
-
-                  {opportunity.notes ? (
-                    <p className="mt-4 text-sm leading-6 text-[#5d5248]">
-                      {opportunity.notes}
-                    </p>
-                  ) : null}
-                </article>
+                <OpportunityCard key={opportunity.id} opportunity={opportunity} />
               ))}
             </div>
           ) : (
@@ -243,11 +194,13 @@ export default async function PatientDetailsPage({
           {contactLogs?.length ? (
             <div className="grid gap-3 bg-[#f8f6ee] p-3">
               {contactLogs.map((contact) => {
-                const { mainText, completionText } = splitCompletionNote(contact.summary);
+                const { label, mainText, highlightedText } = splitHighlightedNote(
+                  contact.summary,
+                );
 
                 return (
                 <article key={contact.id} className={contactCardClassName(contact)}>
-                  <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                  <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="font-semibold">{contact.channel}</p>
@@ -269,13 +222,13 @@ export default async function PatientDetailsPage({
 
                   <p className="mt-4 whitespace-pre-line text-sm leading-6">{mainText}</p>
 
-                  {completionText ? (
+                  {highlightedText ? (
                     <div className="mt-4 rounded-lg border border-[#9e7f60]/30 bg-white/80 p-3">
                       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#9e7f60]">
-                        Conclusao do retorno
+                        {label}
                       </p>
                       <p className="mt-2 whitespace-pre-line text-sm leading-6">
-                        {completionText}
+                        {highlightedText}
                       </p>
                     </div>
                   ) : null}
@@ -324,13 +277,94 @@ function InfoItem({ label, value }: { label: string; value: string }) {
   );
 }
 
-function splitCompletionNote(summary: string) {
-  const marker = "Conclusao do retorno:";
-  const [mainText, completionText] = summary.split(marker);
+function OpportunityCard({ opportunity }: { opportunity: Opportunity }) {
+  const { label, mainText, highlightedText } = splitHighlightedNote(
+    opportunity.notes ?? "",
+  );
+
+  return (
+    <article className="rounded-lg border border-amber-300 bg-amber-50 p-4">
+      <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+        <div>
+          <h3 className="font-semibold">{opportunity.suggested_procedure}</h3>
+          <p className="mt-1 text-sm text-[#5d5248]">
+            Criada em {new Date(opportunity.created_at).toLocaleString("pt-BR")} por{" "}
+            {opportunity.profiles?.full_name ?? "Equipe"}
+          </p>
+        </div>
+        <span className="w-fit rounded-full bg-amber-200 px-3 py-1 text-xs font-medium text-amber-900">
+          {opportunityStatusLabels[opportunity.status] ?? opportunity.status}
+        </span>
+      </div>
+
+      <div className="mt-4 grid gap-3 text-sm md:grid-cols-3">
+        <InfoItem
+          label="Valor"
+          value={
+            opportunity.proposed_value === null
+              ? "Nao informado"
+              : Number(opportunity.proposed_value).toLocaleString("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                })
+          }
+        />
+        <InfoItem
+          label="Retorno previsto"
+          value={
+            opportunity.expected_return_at
+              ? new Date(opportunity.expected_return_at).toLocaleString("pt-BR")
+              : "Nao agendado"
+          }
+        />
+        <InfoItem
+          label="Responsavel"
+          value={opportunity.profiles?.full_name ?? "Equipe"}
+        />
+      </div>
+
+      {mainText ? (
+        <p className="mt-4 whitespace-pre-line text-sm leading-6 text-[#5d5248]">
+          {mainText}
+        </p>
+      ) : null}
+
+      {highlightedText ? (
+        <div className="mt-4 rounded-lg border border-[#9e7f60]/30 bg-white/80 p-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#9e7f60]">
+            {label}
+          </p>
+          <p className="mt-2 whitespace-pre-line text-sm leading-6">
+            {highlightedText}
+          </p>
+        </div>
+      ) : null}
+    </article>
+  );
+}
+
+function splitHighlightedNote(text: string) {
+  const markers = [
+    { label: "Evolucao registrada", marker: "Evolucao registrada:" },
+    { label: "Conclusao do retorno", marker: "Conclusao do retorno:" },
+  ];
+
+  const match = markers.find((item) => text.includes(item.marker));
+
+  if (!match) {
+    return {
+      label: "",
+      mainText: text.trim(),
+      highlightedText: "",
+    };
+  }
+
+  const [mainText, highlightedText] = text.split(match.marker);
 
   return {
+    label: match.label,
     mainText: mainText.trim(),
-    completionText: completionText?.trim() ?? "",
+    highlightedText: highlightedText?.trim() ?? "",
   };
 }
 

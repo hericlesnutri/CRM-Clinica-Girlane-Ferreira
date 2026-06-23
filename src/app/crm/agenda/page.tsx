@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { completeAgendaItem } from "./actions";
+import { EvolutionDialog } from "./evolution-dialog";
 import { requireUser } from "@/lib/auth/require-user";
 
 type ContactReturn = {
@@ -209,25 +210,7 @@ function AgendaColumn({
                     {item.patientName} - {item.patientPhone}
                   </p>
                   </div>
-                  <form action={completeAgendaItem}>
-                    <input name="id" type="hidden" value={item.id} />
-                    <input name="type" type="hidden" value={item.type} />
-                    <label className="sr-only" htmlFor={`completion-${item.type}-${item.id}`}>
-                      Resultado do contato
-                    </label>
-                    <input
-                      className="mb-2 h-8 w-full rounded-lg border border-[#dfd7cc] bg-white px-2 text-xs outline-none transition placeholder:text-[#8b8178] focus:border-[#9e7f60] focus:ring-2 focus:ring-[#dfd7cc]"
-                      id={`completion-${item.type}-${item.id}`}
-                      name="completion_note"
-                      placeholder="Resultado..."
-                    />
-                    <button
-                      className="inline-flex h-8 w-full shrink-0 items-center justify-center rounded-lg bg-[#333333] px-3 text-xs font-medium text-[#f5f3e7] transition hover:bg-[#4a4037]"
-                      type="submit"
-                    >
-                      Concluir
-                    </button>
-                  </form>
+                  <EvolutionDialog itemId={item.id} itemType={item.type} />
                 </div>
 
                 <div className="flex flex-wrap gap-2">
@@ -244,6 +227,16 @@ function AgendaColumn({
                       Abrir ficha
                     </Link>
                   ) : null}
+                  <form action={completeAgendaItem}>
+                    <input name="id" type="hidden" value={item.id} />
+                    <input name="type" type="hidden" value={item.type} />
+                    <button
+                      className="inline-flex h-8 items-center rounded-lg border border-[#dfd7cc] px-3 text-xs font-medium transition hover:bg-[#f5f3e7]"
+                      type="submit"
+                    >
+                      Concluir sem retorno
+                    </button>
+                  </form>
                 </div>
               </div>
               <p className="mt-4 line-clamp-4 text-sm leading-6">{item.description}</p>
