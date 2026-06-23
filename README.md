@@ -53,6 +53,13 @@ Depois de criar o usuario, ajuste o perfil na tabela `profiles`:
 
 O CRM usa a rota `/login` para entrada e `/crm` para o painel protegido.
 
+## Rotas atuais
+
+- `/` pagina inicial
+- `/login` acesso da equipe
+- `/crm` painel protegido com metricas iniciais
+- `/crm/pacientes` cadastro e listagem de pacientes
+
 ## Vercel
 
 1. Envie este repositorio para o GitHub.

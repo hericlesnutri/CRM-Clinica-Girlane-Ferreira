@@ -1,8 +1,8 @@
 import { CalendarDays, DollarSign, PhoneCall, UsersRound } from "lucide-react";
-import { redirect } from "next/navigation";
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { signOut } from "@/app/auth/actions";
-import { createClient } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/auth/require-user";
 
 type Profile = {
   full_name: string;
@@ -17,20 +17,36 @@ const roleLabels: Record<Profile["role"], string> = {
 };
 
 export default async function CrmPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
+  const { supabase, user } = await requireUser();
 
   const { data: profile } = await supabase
     .from("profiles")
     .select("full_name, email, role")
     .eq("id", user.id)
     .single<Profile>();
+
+  const [
+    { count: patientsCount },
+    { count: contactsCount },
+    { count: pendingReturnsCount },
+    { data: openOpportunities },
+  ] = await Promise.all([
+    supabase.from("patients").select("id", { count: "exact", head: true }),
+    supabase.from("contact_logs").select("id", { count: "exact", head: true }),
+    supabase
+      .from("contact_logs")
+      .select("id", { count: "exact", head: true })
+      .not("next_contact_at", "is", null),
+    supabase
+      .from("opportunities")
+      .select("proposed_value")
+      .eq("status", "aberta"),
+  ]);
+
+  const openProposalValue =
+    openOpportunities?.reduce((total, item) => {
+      return total + Number(item.proposed_value ?? 0);
+    }, 0) ?? 0;
 
   return (
     <main className="min-h-screen bg-[var(--brand-offwhite)] text-[var(--brand-dark)]">
@@ -68,35 +84,45 @@ export default async function CrmPage() {
             Proxima etapa
           </p>
           <h2 className="mt-2 text-2xl font-semibold">
-            Estruturar pacientes, agenda e oportunidades.
+            Primeiros modulos do CRM.
           </h2>
           <p className="mt-3 max-w-3xl leading-7 text-[#5d5248]">
-            O login real ja esta conectado ao Supabase. A partir daqui entram as
-            telas de cadastro de pacientes, registro de contatos, propostas em
-            aberto e calendario comercial.
+            O login real ja esta conectado ao Supabase. Comece cadastrando os
+            pacientes para, em seguida, registrar contatos, propostas e retornos.
           </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link
+              className="inline-flex h-10 items-center rounded-lg bg-[#333333] px-4 text-sm font-semibold text-[#f5f3e7] transition hover:bg-[#4a4037]"
+              href="/crm/pacientes"
+            >
+              Cadastrar pacientes
+            </Link>
+          </div>
         </div>
 
         <div className="grid gap-4 md:grid-cols-4">
           <MetricCard
             icon={<UsersRound aria-hidden className="size-5" />}
             label="Pacientes"
-            value="0"
+            value={String(patientsCount ?? 0)}
           />
           <MetricCard
             icon={<PhoneCall aria-hidden className="size-5" />}
             label="Contatos registrados"
-            value="0"
+            value={String(contactsCount ?? 0)}
           />
           <MetricCard
             icon={<CalendarDays aria-hidden className="size-5" />}
             label="Retornos pendentes"
-            value="0"
+            value={String(pendingReturnsCount ?? 0)}
           />
           <MetricCard
             icon={<DollarSign aria-hidden className="size-5" />}
             label="Propostas abertas"
-            value="R$ 0,00"
+            value={openProposalValue.toLocaleString("pt-BR", {
+              style: "currency",
+              currency: "BRL",
+            })}
           />
         </div>
       </section>
