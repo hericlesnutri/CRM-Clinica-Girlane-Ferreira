@@ -58,9 +58,9 @@ O CRM usa a rota `/login` para entrada e `/crm` para o painel protegido.
 - `/` pagina inicial
 - `/login` acesso da equipe
 - `/crm` painel protegido com metricas iniciais
-- `/crm/atendimento` central comercial com cadastro rapido de paciente e formulario unico para contato, oportunidade ou acompanhamento pos-procedimento
+- `/crm/atendimento` central comercial com cadastro rapido de paciente, busca por nome/telefone e formulario unico para contato, oportunidade ou acompanhamento pos-procedimento
 - `/crm/agenda` agenda de retornos comerciais atrasados, de hoje e proximos
-- `/crm/pacientes` cadastro e listagem de pacientes
+- `/crm/pacientes` cadastro e listagem pesquisavel de pacientes
 - `/crm/pacientes/[id]` ficha de consulta do paciente, ultimo procedimento, oportunidades e historico de contatos
 
 Na agenda, os cards usam cores por funcao: oportunidade, aguardando retorno,

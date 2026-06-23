@@ -19,6 +19,7 @@ const initialState: QuickActionState = {};
 
 export function QuickForms({ patients }: { patients: PatientOption[] }) {
   const [phone, setPhone] = useState("");
+  const [patientSearch, setPatientSearch] = useState("");
   const [recordType, setRecordType] = useState<RecordType>("contato");
   const [patientState, patientAction, isPatientPending] = useActionState(
     createQuickPatient,
@@ -110,7 +111,11 @@ export function QuickForms({ patients }: { patients: PatientOption[] }) {
           </div>
 
           <input name="record_type" type="hidden" value={recordType} />
-          <PatientSelect patients={patients} />
+          <PatientSelect
+            onSearchChange={setPatientSearch}
+            patients={filterPatients(patients, patientSearch)}
+            search={patientSearch}
+          />
 
           {recordType === "contato" ? <ContactFields /> : null}
           {recordType === "oportunidade" ? <OpportunityFields /> : null}
@@ -292,21 +297,41 @@ function PostProcedureFields() {
   );
 }
 
-function PatientSelect({ patients }: { patients: PatientOption[] }) {
+function PatientSelect({
+  onSearchChange,
+  patients,
+  search,
+}: {
+  onSearchChange: (value: string) => void;
+  patients: PatientOption[];
+  search: string;
+}) {
   return (
-    <label className="flex flex-col gap-2 text-sm font-medium">
-      Paciente
-      <select className={fieldClassName} name="patient_id" required defaultValue="">
-        <option disabled value="">
-          Selecione o paciente
-        </option>
-        {patients.map((patient) => (
-          <option key={patient.id} value={patient.id}>
-            {patient.name} - {patient.phone}
+    <div className="grid gap-3 md:grid-cols-[1fr_1.5fr]">
+      <label className="flex flex-col gap-2 text-sm font-medium">
+        Buscar paciente
+        <input
+          className={fieldClassName}
+          onChange={(event) => onSearchChange(event.target.value)}
+          placeholder="Nome ou telefone"
+          value={search}
+        />
+      </label>
+
+      <label className="flex flex-col gap-2 text-sm font-medium">
+        Paciente
+        <select className={fieldClassName} name="patient_id" required defaultValue="">
+          <option disabled value="">
+            {patients.length ? "Selecione o paciente" : "Nenhum paciente encontrado"}
           </option>
-        ))}
-      </select>
-    </label>
+          {patients.map((patient) => (
+            <option key={patient.id} value={patient.id}>
+              {patient.name} - {patient.phone}
+            </option>
+          ))}
+        </select>
+      </label>
+    </div>
   );
 }
 
@@ -403,4 +428,25 @@ function formatBrazilianPhone(value: string) {
   }
 
   return formatted;
+}
+
+function filterPatients(patients: PatientOption[], search: string) {
+  const normalizedSearch = normalizeSearch(search);
+
+  if (!normalizedSearch) {
+    return patients;
+  }
+
+  return patients.filter((patient) => {
+    return normalizeSearch(`${patient.name} ${patient.phone}`).includes(normalizedSearch);
+  });
+}
+
+function normalizeSearch(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
 }
