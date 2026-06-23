@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ContactForm } from "./contact-form";
+import { OpportunityForm } from "./opportunity-form";
 import { requireUser } from "@/lib/auth/require-user";
 
 type Patient = {
@@ -25,6 +26,27 @@ type ContactLog = {
   profiles: {
     full_name: string;
   } | null;
+};
+
+type Opportunity = {
+  id: string;
+  suggested_procedure: string;
+  proposed_value: number | null;
+  status: string;
+  expected_return_at: string | null;
+  notes: string | null;
+  created_at: string;
+  profiles: {
+    full_name: string;
+  } | null;
+};
+
+const opportunityStatusLabels: Record<string, string> = {
+  aberta: "Aberta",
+  proposta_enviada: "Proposta enviada",
+  aguardando_retorno: "Aguardando retorno",
+  fechada: "Fechada",
+  perdida: "Perdida",
 };
 
 export default async function PatientDetailsPage({
@@ -53,6 +75,15 @@ export default async function PatientDetailsPage({
     .eq("patient_id", patient.id)
     .order("created_at", { ascending: false })
     .returns<ContactLog[]>();
+
+  const { data: opportunities } = await supabase
+    .from("opportunities")
+    .select(
+      "id, suggested_procedure, proposed_value, status, expected_return_at, notes, created_at, profiles(full_name)",
+    )
+    .eq("patient_id", patient.id)
+    .order("created_at", { ascending: false })
+    .returns<Opportunity[]>();
 
   return (
     <main className="min-h-screen bg-[var(--brand-offwhite)] text-[var(--brand-dark)]">
@@ -90,6 +121,75 @@ export default async function PatientDetailsPage({
             ) : null}
           </div>
         </div>
+
+        <section>
+          <h2 className="mb-3 text-xl font-semibold">Nova oportunidade</h2>
+          <OpportunityForm patientId={patient.id} />
+        </section>
+
+        <section className="rounded-lg border border-[#dfd7cc] bg-white">
+          <div className="border-b border-[#dfd7cc] px-5 py-4">
+            <h2 className="font-semibold">Oportunidades e propostas</h2>
+          </div>
+
+          {opportunities?.length ? (
+            <div className="divide-y divide-[#dfd7cc]">
+              {opportunities.map((opportunity) => (
+                <article key={opportunity.id} className="px-5 py-4">
+                  <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+                    <div>
+                      <h3 className="font-semibold">{opportunity.suggested_procedure}</h3>
+                      <p className="mt-1 text-sm text-[#5d5248]">
+                        Criada em{" "}
+                        {new Date(opportunity.created_at).toLocaleString("pt-BR")} por{" "}
+                        {opportunity.profiles?.full_name ?? "Equipe"}
+                      </p>
+                    </div>
+                    <span className="w-fit rounded-full bg-[#dfd7cc] px-3 py-1 text-xs font-medium text-[#333333]">
+                      {opportunityStatusLabels[opportunity.status] ?? opportunity.status}
+                    </span>
+                  </div>
+
+                  <div className="mt-4 grid gap-3 text-sm md:grid-cols-3">
+                    <InfoItem
+                      label="Valor"
+                      value={
+                        opportunity.proposed_value === null
+                          ? "Nao informado"
+                          : Number(opportunity.proposed_value).toLocaleString("pt-BR", {
+                              style: "currency",
+                              currency: "BRL",
+                            })
+                      }
+                    />
+                    <InfoItem
+                      label="Retorno previsto"
+                      value={
+                        opportunity.expected_return_at
+                          ? new Date(opportunity.expected_return_at).toLocaleString("pt-BR")
+                          : "Nao agendado"
+                      }
+                    />
+                    <InfoItem
+                      label="Responsavel"
+                      value={opportunity.profiles?.full_name ?? "Equipe"}
+                    />
+                  </div>
+
+                  {opportunity.notes ? (
+                    <p className="mt-4 text-sm leading-6 text-[#5d5248]">
+                      {opportunity.notes}
+                    </p>
+                  ) : null}
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="px-5 py-10 text-center text-sm text-[#5d5248]">
+              Nenhuma oportunidade registrada para este paciente.
+            </div>
+          )}
+        </section>
 
         <section>
           <h2 className="mb-3 text-xl font-semibold">Novo contato</h2>

@@ -59,7 +59,7 @@ O CRM usa a rota `/login` para entrada e `/crm` para o painel protegido.
 - `/login` acesso da equipe
 - `/crm` painel protegido com metricas iniciais
 - `/crm/pacientes` cadastro e listagem de pacientes
-- `/crm/pacientes/[id]` ficha do paciente e historico de contatos
+- `/crm/pacientes/[id]` ficha do paciente, oportunidades e historico de contatos
 
 ## Vercel
 

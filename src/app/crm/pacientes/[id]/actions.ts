@@ -8,6 +8,10 @@ export type ContactFormState = {
   message?: string;
 };
 
+export type OpportunityFormState = {
+  message?: string;
+};
+
 export async function createContactLog(
   patientId: string,
   _previousState: ContactFormState,
@@ -39,6 +43,53 @@ export async function createContactLog(
 
   if (error) {
     return { message: "Nao foi possivel registrar o contato." };
+  }
+
+  revalidatePath("/crm");
+  revalidatePath("/crm/pacientes");
+  revalidatePath(`/crm/pacientes/${patientId}`);
+  redirect(`/crm/pacientes/${patientId}`);
+}
+
+export async function createOpportunity(
+  patientId: string,
+  _previousState: OpportunityFormState,
+  formData: FormData,
+): Promise<OpportunityFormState> {
+  const suggestedProcedure = String(formData.get("suggested_procedure") ?? "").trim();
+  const proposedValue = String(formData.get("proposed_value") ?? "").trim();
+  const status = String(formData.get("status") ?? "aberta").trim();
+  const expectedReturnAt = String(formData.get("expected_return_at") ?? "").trim();
+  const notes = String(formData.get("notes") ?? "").trim();
+
+  if (!suggestedProcedure) {
+    return { message: "Informe o procedimento sugerido." };
+  }
+
+  const numericValue = proposedValue
+    ? Number(proposedValue.replace(/\./g, "").replace(",", "."))
+    : null;
+
+  if (numericValue !== null && Number.isNaN(numericValue)) {
+    return { message: "Informe um valor de proposta valido." };
+  }
+
+  const { supabase, user } = await requireUser();
+
+  const { error } = await supabase.from("opportunities").insert({
+    patient_id: patientId,
+    suggested_procedure: suggestedProcedure,
+    proposed_value: numericValue,
+    status,
+    expected_return_at: expectedReturnAt
+      ? new Date(expectedReturnAt).toISOString()
+      : null,
+    owner_id: user.id,
+    notes: notes || null,
+  });
+
+  if (error) {
+    return { message: "Nao foi possivel registrar a oportunidade." };
   }
 
   revalidatePath("/crm");

@@ -28,7 +28,8 @@ export default async function CrmPage() {
   const [
     { count: patientsCount },
     { count: contactsCount },
-    { count: pendingReturnsCount },
+    { count: pendingContactReturnsCount },
+    { count: pendingOpportunityReturnsCount },
     { data: openOpportunities },
   ] = await Promise.all([
     supabase.from("patients").select("id", { count: "exact", head: true }),
@@ -39,9 +40,17 @@ export default async function CrmPage() {
       .not("next_contact_at", "is", null),
     supabase
       .from("opportunities")
+      .select("id", { count: "exact", head: true })
+      .in("status", ["aberta", "proposta_enviada", "aguardando_retorno"])
+      .not("expected_return_at", "is", null),
+    supabase
+      .from("opportunities")
       .select("proposed_value")
-      .eq("status", "aberta"),
+      .in("status", ["aberta", "proposta_enviada", "aguardando_retorno"]),
   ]);
+
+  const pendingReturnsCount =
+    (pendingContactReturnsCount ?? 0) + (pendingOpportunityReturnsCount ?? 0);
 
   const openProposalValue =
     openOpportunities?.reduce((total, item) => {
