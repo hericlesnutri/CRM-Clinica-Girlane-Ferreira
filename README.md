@@ -73,6 +73,8 @@ agenda mostra apenas o proximo lembrete pendente de cada sequencia.
 
 Na ficha do paciente, oportunidades e contatos tambem usam cores por funcao, e
 as conclusoes/evolucoes registradas na agenda aparecem destacadas no historico.
+Ao registrar uma evolucao na agenda, uma nova data de retorno e opcional: com
+data, o card continua o acompanhamento; sem data, o retorno e encerrado.
 
 ## Vercel
 

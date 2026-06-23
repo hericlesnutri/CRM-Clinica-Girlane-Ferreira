@@ -68,12 +68,12 @@ export async function registerAgendaEvolution(formData: FormData) {
   const evolutionNote = String(formData.get("evolution_note") ?? "").trim();
   const nextReturnAt = String(formData.get("next_return_at") ?? "").trim();
 
-  if (!id || !type || !evolutionNote || !nextReturnAt) {
+  if (!id || !type || !evolutionNote) {
     return;
   }
 
   const { supabase, user } = await requireUser();
-  const nextReturnIso = new Date(nextReturnAt).toISOString();
+  const nextReturnIso = nextReturnAt ? new Date(nextReturnAt).toISOString() : null;
 
   if (type === "contact") {
     const { data: contact } = await supabase
@@ -108,33 +108,35 @@ export async function registerAgendaEvolution(formData: FormData) {
         })
         .eq("id", id);
 
-      const { data: nextFollowUp } = await supabase
-        .from("contact_logs")
-        .select("id")
-        .eq("follow_up_group_id", contact.follow_up_group_id)
-        .not("next_contact_at", "is", null)
-        .neq("id", id)
-        .order("next_contact_at", { ascending: true })
-        .limit(1)
-        .maybeSingle<{ id: string }>();
-
-      if (nextFollowUp) {
-        await supabase
+      if (nextReturnIso) {
+        const { data: nextFollowUp } = await supabase
           .from("contact_logs")
-          .update({ next_contact_at: nextReturnIso })
-          .eq("id", nextFollowUp.id);
-      } else {
-        await supabase.from("contact_logs").insert({
-          patient_id: contact.patient_id,
-          contacted_by: user.id,
-          channel: "Pos-procedimento",
-          return_type: "pos_procedimento",
-          follow_up_group_id: contact.follow_up_group_id,
-          summary: `Acompanhamento adicional pos-procedimento.\n\nEvolucao anterior: ${evolutionNote}`,
-          waiting_patient_response: false,
-          next_action: contact.next_action || "Acompanhar recuperacao",
-          next_contact_at: nextReturnIso,
-        });
+          .select("id")
+          .eq("follow_up_group_id", contact.follow_up_group_id)
+          .not("next_contact_at", "is", null)
+          .neq("id", id)
+          .order("next_contact_at", { ascending: true })
+          .limit(1)
+          .maybeSingle<{ id: string }>();
+
+        if (nextFollowUp) {
+          await supabase
+            .from("contact_logs")
+            .update({ next_contact_at: nextReturnIso })
+            .eq("id", nextFollowUp.id);
+        } else {
+          await supabase.from("contact_logs").insert({
+            patient_id: contact.patient_id,
+            contacted_by: user.id,
+            channel: "Pos-procedimento",
+            return_type: "pos_procedimento",
+            follow_up_group_id: contact.follow_up_group_id,
+            summary: `Acompanhamento adicional pos-procedimento.\n\nEvolucao anterior: ${evolutionNote}`,
+            waiting_patient_response: false,
+            next_action: contact.next_action || "Acompanhar recuperacao",
+            next_contact_at: nextReturnIso,
+          });
+        }
       }
     } else {
       await supabase
@@ -142,7 +144,7 @@ export async function registerAgendaEvolution(formData: FormData) {
         .update({
           next_contact_at: nextReturnIso,
           summary: evolvedSummary,
-          waiting_patient_response: true,
+          waiting_patient_response: Boolean(nextReturnIso),
         })
         .eq("id", id);
     }
@@ -164,7 +166,7 @@ export async function registerAgendaEvolution(formData: FormData) {
       .update({
         expected_return_at: nextReturnIso,
         notes: evolvedNotes,
-        status: "aguardando_retorno",
+        status: nextReturnIso ? "aguardando_retorno" : "fechada",
       })
       .eq("id", id);
   }

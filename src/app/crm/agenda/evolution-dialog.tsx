@@ -30,7 +30,8 @@ export function EvolutionDialog({
               <div>
                 <h2 className="text-xl font-semibold">Registrar evolucao</h2>
                 <p className="mt-1 text-sm leading-6 text-[#5d5248]">
-                  Descreva o contato realizado e defina a nova data de retorno.
+                  Descreva o contato realizado. Informe uma nova data somente se
+                  precisar continuar o acompanhamento.
                 </p>
               </div>
               <button
@@ -65,13 +66,15 @@ export function EvolutionDialog({
               </label>
 
               <label className="flex flex-col gap-2 text-sm font-medium">
-                Nova data de retorno
+                Nova data de retorno opcional
                 <input
                   className="h-11 rounded-lg border border-[#dfd7cc] px-3 outline-none transition focus:border-[#9e7f60] focus:ring-2 focus:ring-[#dfd7cc]"
                   name="next_return_at"
-                  required
                   type="datetime-local"
                 />
+                <span className="text-xs leading-5 text-[#5d5248]">
+                  Deixe em branco para encerrar este retorno sem novo contato.
+                </span>
               </label>
 
               <div className="flex flex-wrap justify-end gap-3">
