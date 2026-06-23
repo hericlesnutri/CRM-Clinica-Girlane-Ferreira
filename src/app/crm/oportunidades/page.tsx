@@ -107,24 +107,26 @@ export default async function OpportunitiesPage() {
           <SummaryCard label="Valor fechado" value={formatCurrency(wonValue)} />
         </div>
 
-        <div className="grid gap-4 xl:grid-cols-5">
-          {funnelColumns.map((column) => {
-            const columnItems = items.filter(
-              (opportunity) => opportunity.status === column.status,
-            );
-            const columnValue = columnItems.reduce((total, opportunity) => {
-              return total + Number(opportunity.proposed_value ?? 0);
-            }, 0);
+        <div className="-mx-6 overflow-x-auto px-6 pb-4">
+          <div className="grid min-w-[110rem] grid-cols-5 gap-4">
+            {funnelColumns.map((column) => {
+              const columnItems = items.filter(
+                (opportunity) => opportunity.status === column.status,
+              );
+              const columnValue = columnItems.reduce((total, opportunity) => {
+                return total + Number(opportunity.proposed_value ?? 0);
+              }, 0);
 
-            return (
-              <FunnelColumn
-                column={column}
-                items={columnItems}
-                key={column.status}
-                totalValue={columnValue}
-              />
-            );
-          })}
+              return (
+                <FunnelColumn
+                  column={column}
+                  items={columnItems}
+                  key={column.status}
+                  totalValue={columnValue}
+                />
+              );
+            })}
+          </div>
         </div>
       </section>
     </main>
@@ -180,7 +182,7 @@ function FunnelColumn({
 function OpportunityCard({ opportunity }: { opportunity: Opportunity }) {
   return (
     <article className={cardClassName(opportunity.status)}>
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <span className={badgeClassName(opportunity.status)}>
             {statusLabels[opportunity.status]}
