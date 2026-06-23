@@ -66,6 +66,7 @@ usuarios ja criados no Supabase Auth.
 - `/crm/oportunidades` funil/kanban de oportunidades por status, valor em aberto e acoes comerciais rapidas
 - `/crm/pacientes` cadastro e listagem pesquisavel de pacientes
 - `/crm/pacientes/[id]` ficha editavel do paciente, ultimo procedimento, oportunidades e historico de contatos
+- `/crm/relatorios` indicadores simples de valor em aberto, valor fechado, conversao, contatos e retornos
 
 O funil de oportunidades organiza propostas por etapa: aberta, proposta
 enviada, aguardando retorno, fechada e perdida. Os cards mostram paciente,
