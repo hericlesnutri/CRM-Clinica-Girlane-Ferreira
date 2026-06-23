@@ -6,6 +6,7 @@ type ContactReturn = {
   id: string;
   channel: string;
   return_type: string;
+  follow_up_group_id: string | null;
   summary: string;
   waiting_patient_response: boolean;
   next_action: string | null;
@@ -51,7 +52,7 @@ export default async function AgendaPage() {
     supabase
       .from("contact_logs")
       .select(
-        "id, channel, return_type, summary, waiting_patient_response, next_action, next_contact_at, patients(id, name, phone)",
+        "id, channel, return_type, follow_up_group_id, summary, waiting_patient_response, next_action, next_contact_at, patients(id, name, phone)",
       )
       .not("next_contact_at", "is", null)
       .order("next_contact_at", { ascending: true })
@@ -68,7 +69,7 @@ export default async function AgendaPage() {
   ]);
 
   const agendaItems = [
-    ...(contactReturns ?? []).map(contactToAgendaItem),
+    ...filterVisibleContactReturns(contactReturns ?? []).map(contactToAgendaItem),
     ...(opportunityReturns ?? []).map(opportunityToAgendaItem),
   ].sort((a, b) => {
     return new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime();
@@ -128,6 +129,27 @@ function contactToAgendaItem(contact: ContactReturn): AgendaItem {
   };
 }
 
+function filterVisibleContactReturns(contacts: ContactReturn[]) {
+  const visibleContacts: ContactReturn[] = [];
+  const postProcedureGroups = new Set<string>();
+
+  for (const contact of contacts) {
+    if (contact.return_type !== "pos_procedimento" || !contact.follow_up_group_id) {
+      visibleContacts.push(contact);
+      continue;
+    }
+
+    if (postProcedureGroups.has(contact.follow_up_group_id)) {
+      continue;
+    }
+
+    postProcedureGroups.add(contact.follow_up_group_id);
+    visibleContacts.push(contact);
+  }
+
+  return visibleContacts;
+}
+
 function opportunityToAgendaItem(opportunity: OpportunityReturn): AgendaItem {
   return {
     id: opportunity.id,
@@ -174,7 +196,8 @@ function AgendaColumn({
               className={cardClassName(item.cardKind, tone)}
             >
               <div className="flex flex-col gap-3">
-                <div>
+                <div className="flex items-start justify-between gap-3">
+                  <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <span className={badgeClassName(item.cardKind)}>{item.badge}</span>
                     <p className="text-xs font-medium text-[#9e7f60]">
@@ -185,6 +208,17 @@ function AgendaColumn({
                   <p className="mt-1 text-sm text-[#5d5248]">
                     {item.patientName} - {item.patientPhone}
                   </p>
+                  </div>
+                  <form action={completeAgendaItem}>
+                    <input name="id" type="hidden" value={item.id} />
+                    <input name="type" type="hidden" value={item.type} />
+                    <button
+                      className="inline-flex h-8 shrink-0 items-center rounded-lg bg-[#333333] px-3 text-xs font-medium text-[#f5f3e7] transition hover:bg-[#4a4037]"
+                      type="submit"
+                    >
+                      Concluir
+                    </button>
+                  </form>
                 </div>
 
                 <div className="flex flex-wrap gap-2">
@@ -201,16 +235,6 @@ function AgendaColumn({
                       Abrir ficha
                     </Link>
                   ) : null}
-                  <form action={completeAgendaItem}>
-                    <input name="id" type="hidden" value={item.id} />
-                    <input name="type" type="hidden" value={item.type} />
-                    <button
-                      className="inline-flex h-8 items-center rounded-lg bg-[#333333] px-3 text-xs font-medium text-[#f5f3e7] transition hover:bg-[#4a4037]"
-                      type="submit"
-                    >
-                      Concluir
-                    </button>
-                  </form>
                 </div>
               </div>
               <p className="mt-4 line-clamp-4 text-sm leading-6">{item.description}</p>

@@ -103,6 +103,7 @@ create table public.contact_logs (
   contacted_by uuid references public.profiles(id),
   channel text not null,
   return_type text not null default 'comercial',
+  follow_up_group_id uuid,
   summary text not null,
   patient_objection text,
   waiting_patient_response boolean not null default false,

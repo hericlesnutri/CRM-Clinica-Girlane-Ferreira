@@ -190,6 +190,7 @@ export async function createPostProcedureFollowUp(
     .join(" ");
 
   const firstContactDate = new Date(nextContactAt);
+  const followUpGroupId = crypto.randomUUID();
   const followUps = Array.from({ length: followUpDays }, (_, index) => {
     const scheduledAt = new Date(firstContactDate);
     scheduledAt.setDate(firstContactDate.getDate() + index);
@@ -207,6 +208,7 @@ export async function createPostProcedureFollowUp(
       contacted_by: user.id,
       channel: "Pos-procedimento",
       return_type: "pos_procedimento",
+      follow_up_group_id: followUpGroupId,
       summary,
       waiting_patient_response: false,
       next_action: `D+${dayNumber} - acompanhar recuperacao: ${procedureName}`,

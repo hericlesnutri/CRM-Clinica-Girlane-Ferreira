@@ -68,7 +68,8 @@ pos-procedimento e contato comercial geral. Cada card pode ser concluido para
 sair da fila de retornos.
 
 O acompanhamento pos-procedimento cria uma sequencia de lembretes diarios para
-acompanhar a recuperacao do paciente nos dias seguintes ao procedimento.
+acompanhar a recuperacao do paciente nos dias seguintes ao procedimento. A
+agenda mostra apenas o proximo lembrete pendente de cada sequencia.
 
 ## Vercel
 
