@@ -107,8 +107,8 @@ export default async function OpportunitiesPage() {
           <SummaryCard label="Valor fechado" value={formatCurrency(wonValue)} />
         </div>
 
-        <div className="-mx-6 overflow-x-auto px-6 pb-4">
-          <div className="grid min-w-[110rem] grid-cols-5 gap-4">
+        <div className="-mx-6 overflow-x-auto px-6 pt-3 [transform:rotateX(180deg)]">
+          <div className="grid min-w-[110rem] grid-cols-5 gap-4 [transform:rotateX(180deg)]">
             {funnelColumns.map((column) => {
               const columnItems = items.filter(
                 (opportunity) => opportunity.status === column.status,
@@ -165,7 +165,7 @@ function FunnelColumn({
       </div>
 
       {items.length ? (
-        <div className="flex flex-1 flex-col gap-3 bg-[#f8f6ee] p-3">
+        <div className="flex flex-1 flex-col gap-2 bg-[#f8f6ee] p-2">
           {items.map((opportunity) => (
             <OpportunityCard key={opportunity.id} opportunity={opportunity} />
           ))}
@@ -182,24 +182,26 @@ function FunnelColumn({
 function OpportunityCard({ opportunity }: { opportunity: Opportunity }) {
   return (
     <article className={cardClassName(opportunity.status)}>
-      <div className="flex flex-wrap items-start justify-between gap-3">
+      <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <span className={badgeClassName(opportunity.status)}>
             {statusLabels[opportunity.status]}
           </span>
-          <h3 className="mt-3 font-semibold leading-6">
+          <p className="mt-2 font-semibold leading-5">
+            {opportunity.patients?.name ?? "Paciente removido"}
+          </p>
+          <h3 className="mt-1 text-sm font-medium leading-5">
             {opportunity.suggested_procedure}
           </h3>
         </div>
-        <EvolutionDialog itemId={opportunity.id} itemType="opportunity" />
+        <EvolutionDialog compact itemId={opportunity.id} itemType="opportunity" />
       </div>
 
-      <p className="mt-2 text-sm leading-6 text-[#5d5248]">
-        {opportunity.patients?.name ?? "Paciente removido"} -{" "}
+      <p className="mt-1 text-xs leading-5 text-[#5d5248]">
         {opportunity.patients?.phone ?? "Telefone nao disponivel"}
       </p>
 
-      <div className="mt-4 grid gap-2 text-sm">
+      <div className="mt-3 grid gap-1.5 text-sm">
         <InfoLine label="Valor" value={formatCurrency(opportunity.proposed_value)} />
         <InfoLine
           label="Retorno"
@@ -212,15 +214,15 @@ function OpportunityCard({ opportunity }: { opportunity: Opportunity }) {
       </div>
 
       {opportunity.notes ? (
-        <p className="mt-4 line-clamp-4 whitespace-pre-line text-sm leading-6">
+        <p className="mt-3 line-clamp-3 whitespace-pre-line text-sm leading-5">
           {opportunity.notes}
         </p>
       ) : null}
 
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-3 flex flex-wrap gap-1.5">
         {opportunity.patients ? (
           <Link
-            className="inline-flex h-8 items-center rounded-lg border border-[#dfd7cc] px-3 text-xs font-medium transition hover:bg-[#f5f3e7]"
+            className="inline-flex h-7 items-center rounded-md border border-[#dfd7cc] px-2 text-xs font-medium transition hover:bg-[#f5f3e7]"
             href={`/crm/pacientes/${opportunity.patients.id}`}
           >
             Abrir ficha
@@ -256,7 +258,7 @@ function StatusButton({
       <input name="id" type="hidden" value={id} />
       <input name="status" type="hidden" value={status} />
       <button
-        className="inline-flex h-8 items-center rounded-lg border border-[#dfd7cc] px-3 text-xs font-medium transition hover:bg-[#f5f3e7]"
+        className="inline-flex h-7 items-center rounded-md border border-[#dfd7cc] px-2 text-xs font-medium transition hover:bg-[#f5f3e7]"
         type="submit"
       >
         {title}
@@ -289,7 +291,7 @@ function formatDateTime(value: string) {
 }
 
 function cardClassName(status: OpportunityStatus) {
-  const base = "rounded-lg border p-4 shadow-sm";
+  const base = "rounded-lg border p-3 shadow-sm";
 
   if (status === "fechada") {
     return `${base} border-emerald-300 bg-emerald-50`;
@@ -307,7 +309,7 @@ function cardClassName(status: OpportunityStatus) {
 }
 
 function badgeClassName(status: OpportunityStatus) {
-  const base = "rounded-full px-3 py-1 text-xs font-medium";
+  const base = "rounded-full px-2.5 py-0.5 text-xs font-medium";
 
   if (status === "fechada") {
     return `${base} bg-emerald-200 text-emerald-900`;

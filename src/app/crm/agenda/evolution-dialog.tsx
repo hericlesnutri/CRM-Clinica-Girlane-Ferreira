@@ -6,7 +6,9 @@ import { registerAgendaEvolution } from "./actions";
 export function EvolutionDialog({
   itemId,
   itemType,
+  compact = false,
 }: {
+  compact?: boolean;
   itemId: string;
   itemType: "contact" | "opportunity";
 }) {
@@ -16,11 +18,15 @@ export function EvolutionDialog({
   return (
     <>
       <button
-        className="inline-flex h-8 shrink-0 items-center rounded-lg bg-[#333333] px-3 text-xs font-medium text-[#f5f3e7] transition hover:bg-[#4a4037]"
+        className={
+          compact
+            ? "inline-flex h-7 shrink-0 items-center rounded-md bg-[#333333] px-2 text-[11px] font-medium text-[#f5f3e7] transition hover:bg-[#4a4037]"
+            : "inline-flex h-8 shrink-0 items-center rounded-lg bg-[#333333] px-3 text-xs font-medium text-[#f5f3e7] transition hover:bg-[#4a4037]"
+        }
         onClick={() => setIsOpen(true)}
         type="button"
       >
-        Registrar evolucao
+        {compact ? "Evolucao" : "Registrar evolucao"}
       </button>
 
       {isOpen ? (
