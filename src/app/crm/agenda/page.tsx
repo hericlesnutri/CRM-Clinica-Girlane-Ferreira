@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { completeAgendaItem } from "./actions";
 import { requireUser } from "@/lib/auth/require-user";
 
 type ContactReturn = {
@@ -200,6 +201,16 @@ function AgendaColumn({
                       Abrir ficha
                     </Link>
                   ) : null}
+                  <form action={completeAgendaItem}>
+                    <input name="id" type="hidden" value={item.id} />
+                    <input name="type" type="hidden" value={item.type} />
+                    <button
+                      className="inline-flex h-8 items-center rounded-lg bg-[#333333] px-3 text-xs font-medium text-[#f5f3e7] transition hover:bg-[#4a4037]"
+                      type="submit"
+                    >
+                      Concluir
+                    </button>
+                  </form>
                 </div>
               </div>
               <p className="mt-4 line-clamp-4 text-sm leading-6">{item.description}</p>
