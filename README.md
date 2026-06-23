@@ -65,7 +65,7 @@ O CRM usa a rota `/login` para entrada e `/crm` para o painel protegido.
 
 Na agenda, os cards usam cores por funcao: oportunidade, aguardando retorno,
 pos-procedimento e contato comercial geral. Cada card pode ser concluido para
-sair da fila de retornos.
+sair da fila de retornos, com uma observacao rapida sobre o resultado do contato.
 
 O acompanhamento pos-procedimento cria uma sequencia de lembretes diarios para
 acompanhar a recuperacao do paciente nos dias seguintes ao procedimento. A

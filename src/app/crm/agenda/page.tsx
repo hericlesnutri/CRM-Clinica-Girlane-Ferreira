@@ -196,7 +196,7 @@ function AgendaColumn({
               className={cardClassName(item.cardKind, tone)}
             >
               <div className="flex flex-col gap-3">
-                <div className="flex items-start justify-between gap-3">
+                <div className="grid gap-3 sm:grid-cols-[1fr_8rem]">
                   <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <span className={badgeClassName(item.cardKind)}>{item.badge}</span>
@@ -212,8 +212,17 @@ function AgendaColumn({
                   <form action={completeAgendaItem}>
                     <input name="id" type="hidden" value={item.id} />
                     <input name="type" type="hidden" value={item.type} />
+                    <label className="sr-only" htmlFor={`completion-${item.type}-${item.id}`}>
+                      Resultado do contato
+                    </label>
+                    <input
+                      className="mb-2 h-8 w-full rounded-lg border border-[#dfd7cc] bg-white px-2 text-xs outline-none transition placeholder:text-[#8b8178] focus:border-[#9e7f60] focus:ring-2 focus:ring-[#dfd7cc]"
+                      id={`completion-${item.type}-${item.id}`}
+                      name="completion_note"
+                      placeholder="Resultado..."
+                    />
                     <button
-                      className="inline-flex h-8 shrink-0 items-center rounded-lg bg-[#333333] px-3 text-xs font-medium text-[#f5f3e7] transition hover:bg-[#4a4037]"
+                      className="inline-flex h-8 w-full shrink-0 items-center justify-center rounded-lg bg-[#333333] px-3 text-xs font-medium text-[#f5f3e7] transition hover:bg-[#4a4037]"
                       type="submit"
                     >
                       Concluir
