@@ -19,7 +19,6 @@ const initialState: QuickActionState = {};
 
 export function QuickForms({ patients }: { patients: PatientOption[] }) {
   const [phone, setPhone] = useState("");
-  const [patientSearch, setPatientSearch] = useState("");
   const [recordType, setRecordType] = useState<RecordType>("contato");
   const [patientState, patientAction, isPatientPending] = useActionState(
     createQuickPatient,
@@ -111,11 +110,7 @@ export function QuickForms({ patients }: { patients: PatientOption[] }) {
           </div>
 
           <input name="record_type" type="hidden" value={recordType} />
-          <PatientSelect
-            onSearchChange={setPatientSearch}
-            patients={filterPatients(patients, patientSearch)}
-            search={patientSearch}
-          />
+          <PatientSelect patients={patients} />
 
           {recordType === "contato" ? <ContactFields /> : null}
           {recordType === "oportunidade" ? <OpportunityFields /> : null}
@@ -297,41 +292,73 @@ function PostProcedureFields() {
   );
 }
 
-function PatientSelect({
-  onSearchChange,
-  patients,
-  search,
-}: {
-  onSearchChange: (value: string) => void;
-  patients: PatientOption[];
-  search: string;
-}) {
-  return (
-    <div className="grid gap-3 md:grid-cols-[1fr_1.5fr]">
-      <label className="flex flex-col gap-2 text-sm font-medium">
-        Buscar paciente
-        <input
-          className={fieldClassName}
-          onChange={(event) => onSearchChange(event.target.value)}
-          placeholder="Nome ou telefone"
-          value={search}
-        />
-      </label>
+function PatientSelect({ patients }: { patients: PatientOption[] }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [patientId, setPatientId] = useState("");
+  const [search, setSearch] = useState("");
+  const filteredPatients = filterPatients(patients, search).slice(0, 8);
 
-      <label className="flex flex-col gap-2 text-sm font-medium">
-        Paciente
-        <select className={fieldClassName} name="patient_id" required defaultValue="">
-          <option disabled value="">
-            {patients.length ? "Selecione o paciente" : "Nenhum paciente encontrado"}
-          </option>
-          {patients.map((patient) => (
-            <option key={patient.id} value={patient.id}>
-              {patient.name} - {patient.phone}
-            </option>
-          ))}
-        </select>
-      </label>
-    </div>
+  const selectedPatient = patients.find((patient) => patient.id === patientId);
+
+  function handleSearchChange(value: string) {
+    setSearch(value);
+    setIsOpen(true);
+
+    if (selectedPatient && value !== getPatientLabel(selectedPatient)) {
+      setPatientId("");
+    }
+  }
+
+  function handlePatientSelect(patient: PatientOption) {
+    setPatientId(patient.id);
+    setSearch(getPatientLabel(patient));
+    setIsOpen(false);
+  }
+
+  return (
+    <label className="relative flex flex-col gap-2 text-sm font-medium">
+      Paciente
+      <input name="patient_id" required type="hidden" value={patientId} />
+      <input
+        autoComplete="off"
+        className={fieldClassName}
+        onBlur={() => setTimeout(() => setIsOpen(false), 150)}
+        onChange={(event) => handleSearchChange(event.target.value)}
+        onFocus={() => setIsOpen(true)}
+        placeholder="Digite o nome ou telefone do paciente"
+        required
+        value={search}
+      />
+
+      {isOpen ? (
+        <div className="absolute left-0 right-0 top-[4.6rem] z-20 overflow-hidden rounded-lg border border-[#dfd7cc] bg-white shadow-lg">
+          {filteredPatients.length ? (
+            filteredPatients.map((patient) => (
+              <button
+                className="flex w-full flex-col gap-1 border-b border-[#eee8df] px-3 py-3 text-left last:border-b-0 hover:bg-[#f5f3e7]"
+                key={patient.id}
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => handlePatientSelect(patient)}
+                type="button"
+              >
+                <span className="font-semibold">{patient.name}</span>
+                <span className="text-xs text-[#5d5248]">{patient.phone}</span>
+              </button>
+            ))
+          ) : (
+            <p className="px-3 py-3 text-sm text-[#5d5248]">
+              Nenhum paciente encontrado.
+            </p>
+          )}
+        </div>
+      ) : null}
+
+      {!patientId && search ? (
+        <span className="text-xs font-normal text-[#8a6b4c]">
+          Selecione um paciente da lista para continuar.
+        </span>
+      ) : null}
+    </label>
   );
 }
 
@@ -440,6 +467,10 @@ function filterPatients(patients: PatientOption[], search: string) {
   return patients.filter((patient) => {
     return normalizeSearch(`${patient.name} ${patient.phone}`).includes(normalizedSearch);
   });
+}
+
+function getPatientLabel(patient: PatientOption) {
+  return `${patient.name} - ${patient.phone}`;
 }
 
 function normalizeSearch(value: string) {
