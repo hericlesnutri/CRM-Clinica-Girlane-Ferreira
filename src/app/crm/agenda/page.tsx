@@ -97,15 +97,11 @@ export default async function AgendaPage() {
           </Link>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3">
-          <SummaryCard label="Atrasados" value={groupedItems.overdue.length} />
-          <SummaryCard label="Hoje" value={groupedItems.today.length} />
-          <SummaryCard label="Proximos" value={groupedItems.upcoming.length} />
+        <div className="grid gap-4 lg:grid-cols-3">
+          <AgendaColumn title="Atrasados" items={groupedItems.overdue} tone="danger" />
+          <AgendaColumn title="Hoje" items={groupedItems.today} tone="strong" />
+          <AgendaColumn title="Proximos" items={groupedItems.upcoming} />
         </div>
-
-        <AgendaSection title="Atrasados" items={groupedItems.overdue} tone="danger" />
-        <AgendaSection title="Hoje" items={groupedItems.today} tone="strong" />
-        <AgendaSection title="Proximos retornos" items={groupedItems.upcoming} />
       </section>
     </main>
   );
@@ -146,7 +142,7 @@ function opportunityToAgendaItem(opportunity: OpportunityReturn): AgendaItem {
   };
 }
 
-function AgendaSection({
+function AgendaColumn({
   title,
   items,
   tone = "default",
@@ -156,25 +152,28 @@ function AgendaSection({
   tone?: "default" | "danger" | "strong";
 }) {
   return (
-    <section className="rounded-lg border border-[#dfd7cc] bg-white">
-      <div className="flex items-center justify-between border-b border-[#dfd7cc] px-5 py-4">
+    <section className="flex min-h-[28rem] flex-col rounded-lg border border-[#dfd7cc] bg-white">
+      <div className="flex items-center justify-between border-b border-[#dfd7cc] px-4 py-4">
         <h2 className="font-semibold">{title}</h2>
-        <span className="text-sm text-[#5d5248]">{items.length}</span>
+        <span className={countClassName(tone)}>{items.length}</span>
       </div>
 
       {items.length ? (
-        <div className="divide-y divide-[#dfd7cc]">
+        <div className="flex flex-1 flex-col gap-3 bg-[#f8f6ee] p-3">
           {items.map((item) => (
-            <article key={`${item.type}-${item.id}`} className="px-5 py-4">
-              <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+            <article
+              key={`${item.type}-${item.id}`}
+              className="rounded-lg border border-[#dfd7cc] bg-white p-4 shadow-sm"
+            >
+              <div className="flex flex-col gap-3">
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <span className={badgeClassName(tone)}>{item.badge}</span>
-                    <p className="text-sm font-medium text-[#9e7f60]">
+                    <p className="text-xs font-medium text-[#9e7f60]">
                       {formatDateTime(item.scheduledAt)}
                     </p>
                   </div>
-                  <h3 className="mt-3 font-semibold">{item.title}</h3>
+                  <h3 className="mt-3 font-semibold leading-6">{item.title}</h3>
                   <p className="mt-1 text-sm text-[#5d5248]">
                     {item.patientName} - {item.patientPhone}
                   </p>
@@ -196,25 +195,16 @@ function AgendaSection({
                   ) : null}
                 </div>
               </div>
-              <p className="mt-4 text-sm leading-6">{item.description}</p>
+              <p className="mt-4 line-clamp-4 text-sm leading-6">{item.description}</p>
             </article>
           ))}
         </div>
       ) : (
-        <div className="px-5 py-8 text-center text-sm text-[#5d5248]">
+        <div className="flex flex-1 items-center justify-center bg-[#f8f6ee] px-5 py-8 text-center text-sm text-[#5d5248]">
           Nenhum retorno nesta categoria.
         </div>
       )}
     </section>
-  );
-}
-
-function SummaryCard({ label, value }: { label: string; value: number }) {
-  return (
-    <article className="rounded-lg border border-[#dfd7cc] bg-white p-5">
-      <p className="text-sm text-[#5d5248]">{label}</p>
-      <p className="mt-3 text-3xl font-semibold">{value}</p>
-    </article>
   );
 }
 
@@ -248,6 +238,20 @@ function formatDateTime(value: string) {
 
 function badgeClassName(tone: "default" | "danger" | "strong") {
   const base = "rounded-full px-3 py-1 text-xs font-medium";
+
+  if (tone === "danger") {
+    return `${base} bg-red-50 text-red-700`;
+  }
+
+  if (tone === "strong") {
+    return `${base} bg-[#333333] text-[#f5f3e7]`;
+  }
+
+  return `${base} bg-[#dfd7cc] text-[#333333]`;
+}
+
+function countClassName(tone: "default" | "danger" | "strong") {
+  const base = "rounded-full px-3 py-1 text-xs font-semibold";
 
   if (tone === "danger") {
     return `${base} bg-red-50 text-red-700`;
