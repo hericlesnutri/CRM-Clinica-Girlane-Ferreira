@@ -66,6 +66,7 @@ export async function createQuickContact(
 ): Promise<QuickActionState> {
   const patientId = String(formData.get("patient_id") ?? "").trim();
   const channel = String(formData.get("channel") ?? "").trim();
+  const returnType = String(formData.get("return_type") ?? "comercial").trim();
   const summary = String(formData.get("summary") ?? "").trim();
   const patientObjection = String(formData.get("patient_objection") ?? "").trim();
   const nextAction = String(formData.get("next_action") ?? "").trim();
@@ -81,6 +82,7 @@ export async function createQuickContact(
     patient_id: patientId,
     contacted_by: user.id,
     channel,
+    return_type: returnType,
     summary,
     patient_objection: patientObjection || null,
     waiting_patient_response: waitingPatientResponse,

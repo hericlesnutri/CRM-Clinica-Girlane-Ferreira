@@ -14,7 +14,7 @@ export function ContactForm({ patientId }: { patientId: string }) {
 
   return (
     <form action={formAction} className="grid gap-4 rounded-lg border border-[#dfd7cc] bg-white p-5">
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-3">
         <label className="flex flex-col gap-2 text-sm font-medium">
           Canal do contato
           <select
@@ -31,6 +31,19 @@ export function ContactForm({ patientId }: { patientId: string }) {
             <option value="Instagram">Instagram</option>
             <option value="Presencial">Presencial</option>
             <option value="Outro">Outro</option>
+          </select>
+        </label>
+
+        <label className="flex flex-col gap-2 text-sm font-medium">
+          Tipo do retorno
+          <select
+            className="h-11 rounded-lg border border-[#dfd7cc] bg-white px-3 outline-none transition focus:border-[#9e7f60] focus:ring-2 focus:ring-[#dfd7cc]"
+            name="return_type"
+            defaultValue="comercial"
+          >
+            <option value="comercial">Comercial geral</option>
+            <option value="aguardando_retorno">Aguardando retorno</option>
+            <option value="pos_procedimento">Pos-procedimento</option>
           </select>
         </label>
 

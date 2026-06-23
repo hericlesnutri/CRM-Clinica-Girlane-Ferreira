@@ -102,6 +102,7 @@ create table public.contact_logs (
   opportunity_id uuid references public.opportunities(id) on delete set null,
   contacted_by uuid references public.profiles(id),
   channel text not null,
+  return_type text not null default 'comercial',
   summary text not null,
   patient_objection text,
   waiting_patient_response boolean not null default false,

@@ -4,7 +4,9 @@ import { requireUser } from "@/lib/auth/require-user";
 type ContactReturn = {
   id: string;
   channel: string;
+  return_type: string;
   summary: string;
+  waiting_patient_response: boolean;
   next_action: string | null;
   next_contact_at: string;
   patients: {
@@ -30,6 +32,7 @@ type OpportunityReturn = {
 type AgendaItem = {
   id: string;
   type: "contact" | "opportunity";
+  cardKind: "general" | "waiting" | "postProcedure" | "opportunity";
   patientId: string | null;
   patientName: string;
   patientPhone: string;
@@ -46,7 +49,9 @@ export default async function AgendaPage() {
   const [{ data: contactReturns }, { data: opportunityReturns }] = await Promise.all([
     supabase
       .from("contact_logs")
-      .select("id, channel, summary, next_action, next_contact_at, patients(id, name, phone)")
+      .select(
+        "id, channel, return_type, summary, waiting_patient_response, next_action, next_contact_at, patients(id, name, phone)",
+      )
       .not("next_contact_at", "is", null)
       .order("next_contact_at", { ascending: true })
       .returns<ContactReturn[]>(),
@@ -111,13 +116,14 @@ function contactToAgendaItem(contact: ContactReturn): AgendaItem {
   return {
     id: contact.id,
     type: "contact",
+    cardKind: getContactCardKind(contact),
     patientId: contact.patients?.id ?? null,
     patientName: contact.patients?.name ?? "Paciente removido",
     patientPhone: contact.patients?.phone ?? "Telefone nao disponivel",
     title: contact.next_action || `Contato por ${contact.channel}`,
     description: contact.summary,
     scheduledAt: contact.next_contact_at,
-    badge: "Contato",
+    badge: contactReturnTypeLabels[contact.return_type] ?? "Contato",
   };
 }
 
@@ -125,6 +131,7 @@ function opportunityToAgendaItem(opportunity: OpportunityReturn): AgendaItem {
   return {
     id: opportunity.id,
     type: "opportunity",
+    cardKind: "opportunity",
     patientId: opportunity.patients?.id ?? null,
     patientName: opportunity.patients?.name ?? "Paciente removido",
     patientPhone: opportunity.patients?.phone ?? "Telefone nao disponivel",
@@ -163,12 +170,12 @@ function AgendaColumn({
           {items.map((item) => (
             <article
               key={`${item.type}-${item.id}`}
-              className="rounded-lg border border-[#dfd7cc] bg-white p-4 shadow-sm"
+              className={cardClassName(item.cardKind, tone)}
             >
               <div className="flex flex-col gap-3">
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className={badgeClassName(tone)}>{item.badge}</span>
+                    <span className={badgeClassName(item.cardKind)}>{item.badge}</span>
                     <p className="text-xs font-medium text-[#9e7f60]">
                       {formatDateTime(item.scheduledAt)}
                     </p>
@@ -236,15 +243,53 @@ function formatDateTime(value: string) {
   });
 }
 
-function badgeClassName(tone: "default" | "danger" | "strong") {
-  const base = "rounded-full px-3 py-1 text-xs font-medium";
-
-  if (tone === "danger") {
-    return `${base} bg-red-50 text-red-700`;
+function getContactCardKind(contact: ContactReturn): AgendaItem["cardKind"] {
+  if (contact.return_type === "pos_procedimento") {
+    return "postProcedure";
   }
 
-  if (tone === "strong") {
-    return `${base} bg-[#333333] text-[#f5f3e7]`;
+  if (contact.return_type === "aguardando_retorno" || contact.waiting_patient_response) {
+    return "waiting";
+  }
+
+  return "general";
+}
+
+function cardClassName(
+  cardKind: AgendaItem["cardKind"],
+  columnTone: "default" | "danger" | "strong",
+) {
+  const base = "rounded-lg border p-4 shadow-sm";
+  const overdue = columnTone === "danger" ? " ring-1 ring-red-200" : "";
+
+  if (cardKind === "opportunity") {
+    return `${base} border-amber-300 bg-amber-50${overdue}`;
+  }
+
+  if (cardKind === "waiting") {
+    return `${base} border-sky-300 bg-sky-50${overdue}`;
+  }
+
+  if (cardKind === "postProcedure") {
+    return `${base} border-emerald-300 bg-emerald-50${overdue}`;
+  }
+
+  return `${base} border-[#dfd7cc] bg-white${overdue}`;
+}
+
+function badgeClassName(cardKind: AgendaItem["cardKind"]) {
+  const base = "rounded-full px-3 py-1 text-xs font-medium";
+
+  if (cardKind === "opportunity") {
+    return `${base} bg-amber-200 text-amber-900`;
+  }
+
+  if (cardKind === "waiting") {
+    return `${base} bg-sky-200 text-sky-900`;
+  }
+
+  if (cardKind === "postProcedure") {
+    return `${base} bg-emerald-200 text-emerald-900`;
   }
 
   return `${base} bg-[#dfd7cc] text-[#333333]`;
@@ -270,4 +315,10 @@ const opportunityStatusLabels: Record<string, string> = {
   aguardando_retorno: "Aguardando retorno",
   fechada: "Fechada",
   perdida: "Perdida",
+};
+
+const contactReturnTypeLabels: Record<string, string> = {
+  comercial: "Comercial",
+  aguardando_retorno: "Aguardando retorno",
+  pos_procedimento: "Pos-procedimento",
 };

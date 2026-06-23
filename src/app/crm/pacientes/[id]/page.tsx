@@ -17,6 +17,7 @@ type Patient = {
 type ContactLog = {
   id: string;
   channel: string;
+  return_type: string;
   summary: string;
   patient_objection: string | null;
   waiting_patient_response: boolean;
@@ -49,6 +50,12 @@ const opportunityStatusLabels: Record<string, string> = {
   perdida: "Perdida",
 };
 
+const contactReturnTypeLabels: Record<string, string> = {
+  comercial: "Comercial",
+  aguardando_retorno: "Aguardando retorno",
+  pos_procedimento: "Pos-procedimento",
+};
+
 export default async function PatientDetailsPage({
   params,
 }: {
@@ -70,7 +77,7 @@ export default async function PatientDetailsPage({
   const { data: contactLogs } = await supabase
     .from("contact_logs")
     .select(
-      "id, channel, summary, patient_objection, waiting_patient_response, next_action, next_contact_at, created_at, profiles(full_name)",
+      "id, channel, return_type, summary, patient_objection, waiting_patient_response, next_action, next_contact_at, created_at, profiles(full_name)",
     )
     .eq("patient_id", patient.id)
     .order("created_at", { ascending: false })
@@ -207,7 +214,12 @@ export default async function PatientDetailsPage({
                 <article key={contact.id} className="px-5 py-4">
                   <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                     <div>
-                      <p className="font-semibold">{contact.channel}</p>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="font-semibold">{contact.channel}</p>
+                        <span className="rounded-full bg-[#dfd7cc] px-3 py-1 text-xs font-medium text-[#333333]">
+                          {contactReturnTypeLabels[contact.return_type] ?? "Comercial"}
+                        </span>
+                      </div>
                       <p className="mt-1 text-sm text-[#5d5248]">
                         {new Date(contact.created_at).toLocaleString("pt-BR")} por{" "}
                         {contact.profiles?.full_name ?? "Equipe"}

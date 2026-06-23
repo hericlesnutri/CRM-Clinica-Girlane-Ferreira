@@ -63,6 +63,9 @@ O CRM usa a rota `/login` para entrada e `/crm` para o painel protegido.
 - `/crm/pacientes` cadastro e listagem de pacientes
 - `/crm/pacientes/[id]` ficha do paciente, oportunidades e historico de contatos
 
+Na agenda, os cards usam cores por funcao: oportunidade, aguardando retorno,
+pos-procedimento e contato comercial geral.
+
 ## Vercel
 
 1. Envie este repositorio para o GitHub.

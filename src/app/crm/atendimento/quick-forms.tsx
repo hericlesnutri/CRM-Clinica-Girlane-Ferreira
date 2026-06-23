@@ -93,7 +93,7 @@ export function QuickForms({ patients }: { patients: PatientOption[] }) {
 
         <PatientSelect patients={patients} />
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-3">
           <label className="flex flex-col gap-2 text-sm font-medium">
             Canal
             <select className={fieldClassName} name="channel" required defaultValue="">
@@ -105,6 +105,15 @@ export function QuickForms({ patients }: { patients: PatientOption[] }) {
               <option value="Instagram">Instagram</option>
               <option value="Presencial">Presencial</option>
               <option value="Outro">Outro</option>
+            </select>
+          </label>
+
+          <label className="flex flex-col gap-2 text-sm font-medium">
+            Tipo do retorno
+            <select className={fieldClassName} name="return_type" defaultValue="comercial">
+              <option value="comercial">Comercial geral</option>
+              <option value="aguardando_retorno">Aguardando retorno</option>
+              <option value="pos_procedimento">Pos-procedimento</option>
             </select>
           </label>
 
