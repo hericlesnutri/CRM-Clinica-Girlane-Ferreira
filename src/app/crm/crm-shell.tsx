@@ -47,9 +47,14 @@ export function CrmShell({ children, profile, userEmail }: CrmShellProps) {
   const visibleNavItems = navItems.filter((item) => {
     return !item.adminOnly || profile?.role === "admin";
   });
+  const mobileNavItems = visibleNavItems.filter((item) => {
+    return ["/crm", "/crm/atendimento", "/crm/agenda", "/crm/oportunidades", "/crm/pacientes"].includes(
+      item.href,
+    );
+  });
 
   return (
-    <div className="min-h-screen bg-[var(--brand-offwhite)] text-[var(--brand-dark)]">
+    <div className="min-h-screen bg-[var(--brand-offwhite)] pb-20 text-[var(--brand-dark)] lg:pb-0">
       <header className="sticky top-0 z-40 border-b border-[#dfd7cc] bg-white/95 backdrop-blur">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 py-3 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center justify-between gap-4">
@@ -71,7 +76,7 @@ export function CrmShell({ children, profile, userEmail }: CrmShellProps) {
             </form>
           </div>
 
-          <nav className="-mx-4 overflow-x-auto px-4 pb-1 sm:-mx-6 sm:px-6 lg:mx-0 lg:overflow-visible lg:px-0 lg:pb-0">
+          <nav className="hidden lg:block">
             <div className="flex min-w-max gap-2">
               {visibleNavItems.map((item) => {
                 const Icon = item.icon;
@@ -117,6 +122,27 @@ export function CrmShell({ children, profile, userEmail }: CrmShellProps) {
       </header>
 
       {children}
+
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-[#dfd7cc] bg-white/95 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_24px_rgba(51,51,51,0.08)] backdrop-blur lg:hidden">
+        <div className="mx-auto grid max-w-md grid-cols-5 gap-1">
+          {mobileNavItems.map((item) => {
+            const Icon = item.icon;
+            const isActive =
+              item.href === "/crm" ? pathname === "/crm" : pathname.startsWith(item.href);
+
+            return (
+              <Link
+                className={mobileNavItemClassName(isActive)}
+                href={item.href}
+                key={item.href}
+              >
+                <Icon aria-hidden className="size-5" />
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
     </div>
   );
 }
@@ -130,4 +156,15 @@ function navItemClassName(isActive: boolean) {
   }
 
   return `${base} border border-[#dfd7cc] bg-white text-[#333333] hover:bg-[#f5f3e7]`;
+}
+
+function mobileNavItemClassName(isActive: boolean) {
+  const base =
+    "flex min-w-0 flex-col items-center justify-center gap-1 rounded-lg px-1 py-2 text-[11px] font-semibold transition";
+
+  if (isActive) {
+    return `${base} bg-[#333333] text-[#f5f3e7]`;
+  }
+
+  return `${base} text-[#5d5248] hover:bg-[#f5f3e7]`;
 }
