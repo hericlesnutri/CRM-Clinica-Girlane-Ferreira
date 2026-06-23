@@ -2,10 +2,8 @@
 
 import { useActionState, useState } from "react";
 import {
-  createQuickContact,
-  createQuickOpportunity,
+  createCommercialRecord,
   createQuickPatient,
-  createPostProcedureFollowUp,
   type QuickActionState,
 } from "./actions";
 
@@ -15,24 +13,21 @@ type PatientOption = {
   phone: string;
 };
 
+type RecordType = "contato" | "oportunidade" | "pos_procedimento";
+
 const initialState: QuickActionState = {};
 
 export function QuickForms({ patients }: { patients: PatientOption[] }) {
   const [phone, setPhone] = useState("");
+  const [recordType, setRecordType] = useState<RecordType>("contato");
   const [patientState, patientAction, isPatientPending] = useActionState(
     createQuickPatient,
     initialState,
   );
-  const [contactState, contactAction, isContactPending] = useActionState(
-    createQuickContact,
+  const [commercialState, commercialAction, isCommercialPending] = useActionState(
+    createCommercialRecord,
     initialState,
   );
-  const [opportunityState, opportunityAction, isOpportunityPending] = useActionState(
-    createQuickOpportunity,
-    initialState,
-  );
-  const [postProcedureState, postProcedureAction, isPostProcedurePending] =
-    useActionState(createPostProcedureFollowUp, initialState);
 
   return (
     <div className="grid gap-5">
@@ -45,12 +40,12 @@ export function QuickForms({ patients }: { patients: PatientOption[] }) {
         </div>
 
         <div className="grid gap-4 lg:grid-cols-4">
-          <label className="flex flex-col gap-2 text-sm font-medium lg:col-span-1">
+          <label className="flex flex-col gap-2 text-sm font-medium">
             Nome
             <input className={fieldClassName} name="name" required />
           </label>
 
-          <label className="flex flex-col gap-2 text-sm font-medium lg:col-span-1">
+          <label className="flex flex-col gap-2 text-sm font-medium">
             Telefone / WhatsApp
             <input
               className={fieldClassName}
@@ -85,221 +80,215 @@ export function QuickForms({ patients }: { patients: PatientOption[] }) {
       </form>
 
       {patients.length ? (
-        <div className="grid gap-5 xl:grid-cols-3">
-      <form action={contactAction} className="grid gap-4 rounded-lg border border-[#dfd7cc] bg-white p-5">
-        <div>
-          <h2 className="text-xl font-semibold">Registrar contato</h2>
-          <p className="mt-1 text-sm text-[#5d5248]">
-            Para ligações, WhatsApp, Instagram ou retorno combinado.
-          </p>
+        <form action={commercialAction} className={commercialFormClassName(recordType)}>
+          <div>
+            <h2 className="text-xl font-semibold">Registro comercial</h2>
+            <p className="mt-1 text-sm text-[#5d5248]">
+              Escolha o tipo de registro e preencha apenas os campos necessarios.
+            </p>
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-3">
+            <TypeButton
+              active={recordType === "contato"}
+              description="Conversa, WhatsApp, ligacao ou retorno simples."
+              label="Contato"
+              onClick={() => setRecordType("contato")}
+            />
+            <TypeButton
+              active={recordType === "oportunidade"}
+              description="Proposta, valor e status de negociacao."
+              label="Oportunidade"
+              onClick={() => setRecordType("oportunidade")}
+            />
+            <TypeButton
+              active={recordType === "pos_procedimento"}
+              description="Sequencia de cuidado na recuperacao."
+              label="Pos-procedimento"
+              onClick={() => setRecordType("pos_procedimento")}
+            />
+          </div>
+
+          <input name="record_type" type="hidden" value={recordType} />
+          <PatientSelect patients={patients} />
+
+          {recordType === "contato" ? <ContactFields /> : null}
+          {recordType === "oportunidade" ? <OpportunityFields /> : null}
+          {recordType === "pos_procedimento" ? <PostProcedureFields /> : null}
+
+          {commercialState.message ? <FormError message={commercialState.message} /> : null}
+
+          <button className={buttonClassName} disabled={isCommercialPending} type="submit">
+            {isCommercialPending ? "Salvando..." : submitLabelByType[recordType]}
+          </button>
+        </form>
+      ) : (
+        <div className="rounded-lg border border-[#dfd7cc] bg-white px-5 py-8 text-center text-sm text-[#5d5248]">
+          Cadastre o primeiro paciente acima para liberar os registros comerciais.
         </div>
+      )}
+    </div>
+  );
+}
 
-        <PatientSelect patients={patients} />
-
-        <div className="grid gap-4 md:grid-cols-3">
-          <label className="flex flex-col gap-2 text-sm font-medium">
-            Canal
-            <select className={fieldClassName} name="channel" required defaultValue="">
-              <option disabled value="">
-                Selecione
-              </option>
-              <option value="WhatsApp">WhatsApp</option>
-              <option value="Ligacao">Ligacao</option>
-              <option value="Instagram">Instagram</option>
-              <option value="Presencial">Presencial</option>
-              <option value="Outro">Outro</option>
-            </select>
-          </label>
-
-          <label className="flex flex-col gap-2 text-sm font-medium">
-            Tipo do retorno
-            <select className={fieldClassName} name="return_type" defaultValue="comercial">
-              <option value="comercial">Comercial geral</option>
-              <option value="aguardando_retorno">Aguardando retorno</option>
-              <option value="pos_procedimento">Pos-procedimento</option>
-            </select>
-          </label>
-
-          <label className="flex flex-col gap-2 text-sm font-medium">
-            Proximo contato
-            <input className={fieldClassName} name="next_contact_at" type="datetime-local" />
-          </label>
-        </div>
+function ContactFields() {
+  return (
+    <>
+      <div className="grid gap-4 md:grid-cols-3">
+        <label className="flex flex-col gap-2 text-sm font-medium">
+          Canal
+          <select className={fieldClassName} name="channel" required defaultValue="">
+            <option disabled value="">
+              Selecione
+            </option>
+            <option value="WhatsApp">WhatsApp</option>
+            <option value="Ligacao">Ligacao</option>
+            <option value="Instagram">Instagram</option>
+            <option value="Presencial">Presencial</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </label>
 
         <label className="flex flex-col gap-2 text-sm font-medium">
-          O que foi conversado
-          <textarea
-            className={`${fieldClassName} min-h-28 py-3`}
-            name="summary"
-            placeholder="Resumo da conversa, interesse, orientacoes e combinados..."
-            required
-          />
+          Tipo do retorno
+          <select className={fieldClassName} name="return_type" defaultValue="comercial">
+            <option value="comercial">Comercial geral</option>
+            <option value="aguardando_retorno">Aguardando retorno</option>
+            <option value="pos_procedimento">Pos-procedimento</option>
+          </select>
         </label>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className="flex flex-col gap-2 text-sm font-medium">
-            Objecao
-            <input className={fieldClassName} name="patient_objection" />
-          </label>
-
-          <label className="flex flex-col gap-2 text-sm font-medium">
-            Proxima acao
-            <input className={fieldClassName} name="next_action" />
-          </label>
-        </div>
-
-        <label className="flex items-center gap-3 rounded-lg border border-[#dfd7cc] bg-[#f5f3e7] px-4 py-3 text-sm font-medium">
-          <input className="size-4 accent-[#9e7f60]" name="waiting_patient_response" type="checkbox" />
-          Aguardando retorno do paciente
-        </label>
-
-        {contactState.message ? <FormError message={contactState.message} /> : null}
-
-        <button className={buttonClassName} disabled={isContactPending} type="submit">
-          {isContactPending ? "Salvando..." : "Salvar contato"}
-        </button>
-      </form>
-
-      <form action={opportunityAction} className="grid gap-4 rounded-lg border border-[#dfd7cc] bg-white p-5">
-        <div>
-          <h2 className="text-xl font-semibold">Registrar oportunidade</h2>
-          <p className="mt-1 text-sm text-[#5d5248]">
-            Para proposta, procedimento sugerido e valor em aberto.
-          </p>
-        </div>
-
-        <PatientSelect patients={patients} />
 
         <label className="flex flex-col gap-2 text-sm font-medium">
-          Procedimento sugerido
-          <input
-            className={fieldClassName}
-            name="suggested_procedure"
-            placeholder="Ex.: bioestimulador, harmonizacao, emagrecimento..."
-            required
-          />
+          Proximo contato
+          <input className={fieldClassName} name="next_contact_at" type="datetime-local" />
+        </label>
+      </div>
+
+      <label className="flex flex-col gap-2 text-sm font-medium">
+        O que foi conversado
+        <textarea
+          className={`${fieldClassName} min-h-28 py-3`}
+          name="summary"
+          placeholder="Resumo da conversa, interesse, orientacoes e combinados..."
+          required
+        />
+      </label>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <label className="flex flex-col gap-2 text-sm font-medium">
+          Objecao
+          <input className={fieldClassName} name="patient_objection" />
         </label>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className="flex flex-col gap-2 text-sm font-medium">
-            Valor
-            <input className={fieldClassName} inputMode="decimal" name="proposed_value" placeholder="1500,00" />
-          </label>
+        <label className="flex flex-col gap-2 text-sm font-medium">
+          Proxima acao
+          <input className={fieldClassName} name="next_action" />
+        </label>
+      </div>
 
-          <label className="flex flex-col gap-2 text-sm font-medium">
-            Status
-            <select className={fieldClassName} defaultValue="aberta" name="status">
-              <option value="aberta">Aberta</option>
-              <option value="proposta_enviada">Proposta enviada</option>
-              <option value="aguardando_retorno">Aguardando retorno</option>
-              <option value="fechada">Fechada</option>
-              <option value="perdida">Perdida</option>
-            </select>
-          </label>
-        </div>
+      <label className="flex items-center gap-3 rounded-lg border border-[#dfd7cc] bg-[#f5f3e7] px-4 py-3 text-sm font-medium">
+        <input className="size-4 accent-[#9e7f60]" name="waiting_patient_response" type="checkbox" />
+        Aguardando retorno do paciente
+      </label>
+    </>
+  );
+}
+
+function OpportunityFields() {
+  return (
+    <>
+      <label className="flex flex-col gap-2 text-sm font-medium">
+        Procedimento sugerido
+        <input
+          className={fieldClassName}
+          name="suggested_procedure"
+          placeholder="Ex.: bioestimulador, harmonizacao, emagrecimento..."
+          required
+        />
+      </label>
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <label className="flex flex-col gap-2 text-sm font-medium">
+          Valor
+          <input className={fieldClassName} inputMode="decimal" name="proposed_value" placeholder="1500,00" />
+        </label>
+
+        <label className="flex flex-col gap-2 text-sm font-medium">
+          Status
+          <select className={fieldClassName} defaultValue="aberta" name="status">
+            <option value="aberta">Aberta</option>
+            <option value="proposta_enviada">Proposta enviada</option>
+            <option value="aguardando_retorno">Aguardando retorno</option>
+            <option value="fechada">Fechada</option>
+            <option value="perdida">Perdida</option>
+          </select>
+        </label>
 
         <label className="flex flex-col gap-2 text-sm font-medium">
           Retorno previsto
           <input className={fieldClassName} name="expected_return_at" type="datetime-local" />
         </label>
+      </div>
 
+      <label className="flex flex-col gap-2 text-sm font-medium">
+        Observacoes da proposta
+        <textarea
+          className={`${fieldClassName} min-h-28 py-3`}
+          name="notes"
+          placeholder="Condicoes, expectativa do paciente, combinados e estrategia..."
+        />
+      </label>
+    </>
+  );
+}
+
+function PostProcedureFields() {
+  return (
+    <>
+      <label className="flex flex-col gap-2 text-sm font-medium">
+        Procedimento realizado
+        <input
+          className={fieldClassName}
+          name="procedure_name"
+          placeholder="Ex.: bioestimulador, preenchimento labial..."
+          required
+        />
+      </label>
+
+      <div className="grid gap-4 md:grid-cols-3">
         <label className="flex flex-col gap-2 text-sm font-medium">
-          Observacoes da proposta
-          <textarea
-            className={`${fieldClassName} min-h-28 py-3`}
-            name="notes"
-            placeholder="Condições, expectativa do paciente, combinados e estrategia..."
-          />
+          Data do procedimento
+          <input className={fieldClassName} name="performed_at" type="date" />
         </label>
 
-        {opportunityState.message ? (
-          <FormError message={opportunityState.message} />
-        ) : null}
-
-        <button className={buttonClassName} disabled={isOpportunityPending} type="submit">
-          {isOpportunityPending ? "Salvando..." : "Salvar oportunidade"}
-        </button>
-      </form>
-
-      <form action={postProcedureAction} className="grid gap-4 rounded-lg border border-emerald-300 bg-emerald-50 p-5">
-        <div>
-          <h2 className="text-xl font-semibold">Acompanhamento pos-procedimento</h2>
-          <p className="mt-1 text-sm text-[#496356]">
-            Cria lembretes em dias seguidos para acompanhar a recuperacao.
-          </p>
-        </div>
-
-        <PatientSelect patients={patients} />
+        <label className="flex flex-col gap-2 text-sm font-medium">
+          Primeiro acompanhamento
+          <input className={fieldClassName} name="next_contact_at" required type="datetime-local" />
+        </label>
 
         <label className="flex flex-col gap-2 text-sm font-medium">
-          Procedimento realizado
+          Dias seguidos
           <input
             className={fieldClassName}
-            name="procedure_name"
-            placeholder="Ex.: bioestimulador, preenchimento labial..."
+            defaultValue={3}
+            max={10}
+            min={1}
+            name="follow_up_days"
             required
+            type="number"
           />
         </label>
+      </div>
 
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-1">
-          <label className="flex flex-col gap-2 text-sm font-medium">
-            Data do procedimento
-            <input className={fieldClassName} name="performed_at" type="date" />
-          </label>
-
-          <label className="flex flex-col gap-2 text-sm font-medium">
-            Primeiro contato de acompanhamento
-            <input
-              className={fieldClassName}
-              name="next_contact_at"
-              required
-              type="datetime-local"
-            />
-          </label>
-
-          <label className="flex flex-col gap-2 text-sm font-medium">
-            Dias seguidos de acompanhamento
-            <input
-              className={fieldClassName}
-              defaultValue={3}
-              max={10}
-              min={1}
-              name="follow_up_days"
-              required
-              type="number"
-            />
-          </label>
-        </div>
-
-        <label className="flex flex-col gap-2 text-sm font-medium">
-          Observacoes do acompanhamento
-          <textarea
-            className={`${fieldClassName} min-h-28 py-3`}
-            name="notes"
-            placeholder="Orientacoes passadas, ponto de atencao, sensibilidade relatada..."
-          />
-        </label>
-
-        {postProcedureState.message ? (
-          <FormError message={postProcedureState.message} />
-        ) : null}
-
-        <button
-          className={buttonClassName}
-          disabled={isPostProcedurePending}
-          type="submit"
-        >
-          {isPostProcedurePending ? "Salvando..." : "Agendar pos-procedimento"}
-        </button>
-      </form>
-        </div>
-      ) : (
-        <div className="rounded-lg border border-[#dfd7cc] bg-white px-5 py-8 text-center text-sm text-[#5d5248]">
-          Cadastre o primeiro paciente acima para liberar os registros de contato
-          e oportunidade.
-        </div>
-      )}
-    </div>
+      <label className="flex flex-col gap-2 text-sm font-medium">
+        Observacoes do acompanhamento
+        <textarea
+          className={`${fieldClassName} min-h-28 py-3`}
+          name="notes"
+          placeholder="Orientacoes passadas, ponto de atencao, sensibilidade relatada..."
+        />
+      </label>
+    </>
   );
 }
 
@@ -321,6 +310,35 @@ function PatientSelect({ patients }: { patients: PatientOption[] }) {
   );
 }
 
+function TypeButton({
+  active,
+  description,
+  label,
+  onClick,
+}: {
+  active: boolean;
+  description: string;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      className={`rounded-lg border p-4 text-left transition ${
+        active
+          ? "border-[#333333] bg-[#333333] text-[#f5f3e7]"
+          : "border-[#dfd7cc] bg-white hover:bg-[#f5f3e7]"
+      }`}
+      onClick={onClick}
+      type="button"
+    >
+      <span className="font-semibold">{label}</span>
+      <span className={`mt-1 block text-sm ${active ? "text-[#dfd7cc]" : "text-[#5d5248]"}`}>
+        {description}
+      </span>
+    </button>
+  );
+}
+
 function FormError({ message }: { message: string }) {
   return (
     <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -334,6 +352,26 @@ const fieldClassName =
 
 const buttonClassName =
   "h-11 rounded-lg bg-[#333333] px-5 font-semibold text-[#f5f3e7] transition hover:bg-[#4a4037] disabled:cursor-not-allowed disabled:opacity-70 md:w-fit";
+
+const submitLabelByType: Record<RecordType, string> = {
+  contato: "Salvar contato",
+  oportunidade: "Salvar oportunidade",
+  pos_procedimento: "Criar sequencia pos-procedimento",
+};
+
+function commercialFormClassName(recordType: RecordType) {
+  const base = "grid gap-4 rounded-lg border p-5";
+
+  if (recordType === "oportunidade") {
+    return `${base} border-amber-300 bg-amber-50`;
+  }
+
+  if (recordType === "pos_procedimento") {
+    return `${base} border-emerald-300 bg-emerald-50`;
+  }
+
+  return `${base} border-[#dfd7cc] bg-white`;
+}
 
 function formatBrazilianPhone(value: string) {
   const digits = value.replace(/\D/g, "").replace(/^55/, "").slice(0, 11);

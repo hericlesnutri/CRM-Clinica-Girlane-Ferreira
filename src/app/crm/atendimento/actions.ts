@@ -230,3 +230,24 @@ export async function createPostProcedureFollowUp(
   revalidatePath(`/crm/pacientes/${patientId}`);
   redirect("/crm/atendimento?salvo=pos_procedimento");
 }
+
+export async function createCommercialRecord(
+  _previousState: QuickActionState,
+  formData: FormData,
+): Promise<QuickActionState> {
+  const recordType = String(formData.get("record_type") ?? "").trim();
+
+  if (recordType === "contato") {
+    return createQuickContact(_previousState, formData);
+  }
+
+  if (recordType === "oportunidade") {
+    return createQuickOpportunity(_previousState, formData);
+  }
+
+  if (recordType === "pos_procedimento") {
+    return createPostProcedureFollowUp(_previousState, formData);
+  }
+
+  return { message: "Selecione o tipo de registro comercial." };
+}
