@@ -62,7 +62,7 @@ O CRM usa a rota `/login` para entrada e `/crm` para o painel protegido.
 - `/crm/agenda` agenda de retornos comerciais atrasados, de hoje e proximos
 - `/crm/oportunidades` funil/kanban de oportunidades por status, valor em aberto e acoes comerciais rapidas
 - `/crm/pacientes` cadastro e listagem pesquisavel de pacientes
-- `/crm/pacientes/[id]` ficha de consulta do paciente, ultimo procedimento, oportunidades e historico de contatos
+- `/crm/pacientes/[id]` ficha editavel do paciente, ultimo procedimento, oportunidades e historico de contatos
 
 O funil de oportunidades organiza propostas por etapa: aberta, proposta
 enviada, aguardando retorno, fechada e perdida. Os cards mostram paciente,
@@ -81,6 +81,9 @@ Na ficha do paciente, oportunidades e contatos tambem usam cores por funcao, e
 as conclusoes/evolucoes registradas na agenda aparecem destacadas no historico.
 Ao registrar uma evolucao na agenda, uma nova data de retorno e opcional: com
 data, o card continua o acompanhamento; sem data, o retorno e encerrado.
+
+A ficha do paciente permite editar nome, telefone, origem, interesse principal e
+observacoes sem reabrir formulários de contato ou oportunidade.
 
 ## Vercel
 

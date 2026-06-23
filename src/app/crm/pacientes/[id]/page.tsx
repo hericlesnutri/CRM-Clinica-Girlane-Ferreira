@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PatientEditDialog } from "./patient-edit-dialog";
 import { requireUser } from "@/lib/auth/require-user";
 
 type Patient = {
@@ -63,10 +64,13 @@ const contactReturnTypeLabels: Record<string, string> = {
 
 export default async function PatientDetailsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ salvo?: string }>;
 }) {
   const { id } = await params;
+  const { salvo } = await searchParams;
   const { supabase } = await requireUser();
 
   const { data: patient } = await supabase
@@ -113,17 +117,25 @@ export default async function PatientDetailsPage({
           <Link className="text-sm font-medium text-[#9e7f60]" href="/crm/pacientes">
             Voltar aos pacientes
           </Link>
+          {salvo === "paciente" ? (
+            <div className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
+              Paciente atualizado com sucesso.
+            </div>
+          ) : null}
           <div className="mt-4 rounded-lg border border-[#dfd7cc] bg-white p-5">
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <div>
                 <h1 className="text-3xl font-semibold">{patient.name}</h1>
                 <p className="mt-2 text-[#5d5248]">{patient.phone}</p>
               </div>
-              <div className="rounded-lg bg-[#f5f3e7] px-4 py-3 text-sm">
-                <p className="font-medium">Interesse principal</p>
-                <p className="mt-1 text-[#5d5248]">
-                  {patient.main_interest ?? "Nao informado"}
-                </p>
+              <div className="flex flex-col gap-3 md:items-end">
+                <PatientEditDialog patient={patient} />
+                <div className="rounded-lg bg-[#f5f3e7] px-4 py-3 text-sm md:text-right">
+                  <p className="font-medium">Interesse principal</p>
+                  <p className="mt-1 text-[#5d5248]">
+                    {patient.main_interest ?? "Nao informado"}
+                  </p>
+                </div>
               </div>
             </div>
 
