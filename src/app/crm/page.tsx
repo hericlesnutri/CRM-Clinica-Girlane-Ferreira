@@ -125,6 +125,14 @@ export default async function CrmPage() {
             >
               Cadastrar pacientes
             </Link>
+            {profile?.role === "admin" ? (
+              <Link
+                className="inline-flex h-10 items-center rounded-lg border border-[#dfd7cc] px-4 text-sm font-semibold transition hover:bg-[#f5f3e7]"
+                href="/crm/admin"
+              >
+                Administrar equipe
+              </Link>
+            ) : null}
           </div>
         </div>
 

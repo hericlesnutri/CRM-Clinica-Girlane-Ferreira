@@ -38,7 +38,7 @@ Acesse `http://localhost:3000`.
 1. Crie um projeto no Supabase.
 2. Copie `Project URL` para `NEXT_PUBLIC_SUPABASE_URL`.
 3. Copie `anon public` para `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
-4. No SQL Editor do Supabase, execute `supabase/migrations/001_initial_crm_schema.sql`.
+4. No SQL Editor do Supabase, execute as migrations da pasta `supabase/migrations` em ordem.
 5. Em Authentication, configure o login por e-mail.
 
 ## Criar usuarios
@@ -52,12 +52,15 @@ Depois de criar o usuario, ajuste o perfil na tabela `profiles`:
 - `role = comercial` para equipe comercial
 
 O CRM usa a rota `/login` para entrada e `/crm` para o painel protegido.
+Administradores podem acessar `/crm/admin` para ajustar nome e perfil dos
+usuarios ja criados no Supabase Auth.
 
 ## Rotas atuais
 
 - `/` pagina inicial
 - `/login` acesso da equipe
 - `/crm` painel protegido com metricas iniciais
+- `/crm/admin` administracao da equipe e perfis de acesso, visivel apenas para admin
 - `/crm/atendimento` central comercial com cadastro rapido de paciente, busca por nome/telefone e formulario unico para contato, oportunidade ou acompanhamento pos-procedimento
 - `/crm/agenda` agenda de retornos comerciais atrasados, de hoje e proximos
 - `/crm/oportunidades` funil/kanban de oportunidades por status, valor em aberto e acoes comerciais rapidas
