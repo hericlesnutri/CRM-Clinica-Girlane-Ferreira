@@ -1,4 +1,5 @@
 import { CalendarDays, CheckCircle2, LockKeyhole, UsersRound } from "lucide-react";
+import Link from "next/link";
 import type { ReactNode } from "react";
 
 export default function Home() {
@@ -23,6 +24,12 @@ export default function Home() {
           <div className="rounded-lg bg-[#333333] px-5 py-4 text-[#f5f3e7]">
             <p className="text-sm text-[#dfd7cc]">Stack</p>
             <p className="mt-1 font-medium">Next.js + Supabase + Vercel</p>
+            <Link
+              className="mt-4 inline-flex h-10 items-center rounded-lg bg-[#f5f3e7] px-4 text-sm font-semibold text-[#333333] transition hover:bg-[#dfd7cc]"
+              href="/login"
+            >
+              Entrar no CRM
+            </Link>
           </div>
         </header>
 

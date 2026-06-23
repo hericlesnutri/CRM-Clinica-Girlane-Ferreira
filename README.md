@@ -41,6 +41,18 @@ Acesse `http://localhost:3000`.
 4. No SQL Editor do Supabase, execute `supabase/migrations/001_initial_crm_schema.sql`.
 5. Em Authentication, configure o login por e-mail.
 
+## Criar usuarios
+
+No Supabase, acesse `Authentication` > `Users` > `Add user`.
+
+Depois de criar o usuario, ajuste o perfil na tabela `profiles`:
+
+- `role = admin` para administrador
+- `role = recepcionista` para recepcao
+- `role = comercial` para equipe comercial
+
+O CRM usa a rota `/login` para entrada e `/crm` para o painel protegido.
+
 ## Vercel
 
 1. Envie este repositorio para o GitHub.
