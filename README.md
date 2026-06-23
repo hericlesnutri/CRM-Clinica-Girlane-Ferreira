@@ -60,8 +60,14 @@ O CRM usa a rota `/login` para entrada e `/crm` para o painel protegido.
 - `/crm` painel protegido com metricas iniciais
 - `/crm/atendimento` central comercial com cadastro rapido de paciente, busca por nome/telefone e formulario unico para contato, oportunidade ou acompanhamento pos-procedimento
 - `/crm/agenda` agenda de retornos comerciais atrasados, de hoje e proximos
+- `/crm/oportunidades` funil/kanban de oportunidades por status, valor em aberto e acoes comerciais rapidas
 - `/crm/pacientes` cadastro e listagem pesquisavel de pacientes
 - `/crm/pacientes/[id]` ficha de consulta do paciente, ultimo procedimento, oportunidades e historico de contatos
+
+O funil de oportunidades organiza propostas por etapa: aberta, proposta
+enviada, aguardando retorno, fechada e perdida. Os cards mostram paciente,
+telefone, procedimento, valor, retorno previsto e permitem registrar evolucao ou
+alterar o status rapidamente.
 
 Na agenda, os cards usam cores por funcao: oportunidade, aguardando retorno,
 pos-procedimento e contato comercial geral. Cada card pode ser concluido para

@@ -38,9 +38,9 @@ export async function completeAgendaItem(formData: FormData) {
   if (type === "opportunity") {
     const { data: opportunity } = await supabase
       .from("opportunities")
-      .select("notes")
+      .select("notes, patient_id")
       .eq("id", id)
-      .single<{ notes: string | null }>();
+      .single<{ notes: string | null; patient_id: string }>();
 
     const completedNotes = completionNote
       ? [opportunity?.notes, `Conclusao do retorno: ${completionNote}`]
@@ -56,10 +56,15 @@ export async function completeAgendaItem(formData: FormData) {
         notes: completedNotes,
       })
       .eq("id", id);
+
+    if (opportunity?.patient_id) {
+      revalidatePath(`/crm/pacientes/${opportunity.patient_id}`);
+    }
   }
 
   revalidatePath("/crm");
   revalidatePath("/crm/agenda");
+  revalidatePath("/crm/oportunidades");
 }
 
 export async function registerAgendaEvolution(formData: FormData) {
@@ -153,9 +158,9 @@ export async function registerAgendaEvolution(formData: FormData) {
   if (type === "opportunity") {
     const { data: opportunity } = await supabase
       .from("opportunities")
-      .select("notes")
+      .select("notes, patient_id")
       .eq("id", id)
-      .single<{ notes: string | null }>();
+      .single<{ notes: string | null; patient_id: string }>();
 
     const evolvedNotes = [opportunity?.notes, `Evolucao registrada: ${evolutionNote}`]
       .filter(Boolean)
@@ -169,8 +174,13 @@ export async function registerAgendaEvolution(formData: FormData) {
         status: nextReturnIso ? "aguardando_retorno" : "fechada",
       })
       .eq("id", id);
+
+    if (opportunity?.patient_id) {
+      revalidatePath(`/crm/pacientes/${opportunity.patient_id}`);
+    }
   }
 
   revalidatePath("/crm");
   revalidatePath("/crm/agenda");
+  revalidatePath("/crm/oportunidades");
 }

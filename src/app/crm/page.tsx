@@ -115,6 +115,12 @@ export default async function CrmPage() {
             </Link>
             <Link
               className="inline-flex h-10 items-center rounded-lg border border-[#dfd7cc] px-4 text-sm font-semibold transition hover:bg-[#f5f3e7]"
+              href="/crm/oportunidades"
+            >
+              Ver funil de oportunidades
+            </Link>
+            <Link
+              className="inline-flex h-10 items-center rounded-lg border border-[#dfd7cc] px-4 text-sm font-semibold transition hover:bg-[#f5f3e7]"
               href="/crm/pacientes"
             >
               Cadastrar pacientes
