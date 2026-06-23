@@ -65,5 +65,5 @@ const successMessages: Record<string, string> = {
   paciente: "Paciente cadastrado com sucesso.",
   contato: "Contato registrado com sucesso.",
   oportunidade: "Oportunidade registrada com sucesso.",
-  pos_procedimento: "Acompanhamento pos-procedimento agendado com sucesso.",
+  pos_procedimento: "Sequencia de acompanhamento pos-procedimento criada com sucesso.",
 };

@@ -225,7 +225,7 @@ export function QuickForms({ patients }: { patients: PatientOption[] }) {
         <div>
           <h2 className="text-xl font-semibold">Acompanhamento pos-procedimento</h2>
           <p className="mt-1 text-sm text-[#496356]">
-            Para pacientes que ja realizaram procedimento e precisam de cuidado no pos.
+            Cria lembretes em dias seguidos para acompanhar a recuperacao.
           </p>
         </div>
 
@@ -248,12 +248,25 @@ export function QuickForms({ patients }: { patients: PatientOption[] }) {
           </label>
 
           <label className="flex flex-col gap-2 text-sm font-medium">
-            Quando retornar contato
+            Primeiro contato de acompanhamento
             <input
               className={fieldClassName}
               name="next_contact_at"
               required
               type="datetime-local"
+            />
+          </label>
+
+          <label className="flex flex-col gap-2 text-sm font-medium">
+            Dias seguidos de acompanhamento
+            <input
+              className={fieldClassName}
+              defaultValue={3}
+              max={10}
+              min={1}
+              name="follow_up_days"
+              required
+              type="number"
             />
           </label>
         </div>

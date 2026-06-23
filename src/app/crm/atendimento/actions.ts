@@ -154,12 +154,17 @@ export async function createPostProcedureFollowUp(
   const procedureName = String(formData.get("procedure_name") ?? "").trim();
   const performedAt = String(formData.get("performed_at") ?? "").trim();
   const nextContactAt = String(formData.get("next_contact_at") ?? "").trim();
+  const followUpDays = Number(formData.get("follow_up_days") ?? 3);
   const notes = String(formData.get("notes") ?? "").trim();
 
   if (!patientId || !procedureName || !nextContactAt) {
     return {
       message: "Selecione o paciente, informe o procedimento e agende o retorno.",
     };
+  }
+
+  if (!Number.isInteger(followUpDays) || followUpDays < 1 || followUpDays > 10) {
+    return { message: "Informe uma sequencia entre 1 e 10 dias de acompanhamento." };
   }
 
   const { supabase, user } = await requireUser();
@@ -175,8 +180,7 @@ export async function createPostProcedureFollowUp(
     return { message: "Nao foi possivel registrar o procedimento realizado." };
   }
 
-  const summary = [
-    `Acompanhamento pos-procedimento: ${procedureName}.`,
+  const baseSummary = [
     performedAt
       ? `Procedimento realizado em ${new Date(performedAt).toLocaleDateString("pt-BR")}.`
       : null,
@@ -185,19 +189,39 @@ export async function createPostProcedureFollowUp(
     .filter(Boolean)
     .join(" ");
 
-  const { error: contactError } = await supabase.from("contact_logs").insert({
-    patient_id: patientId,
-    contacted_by: user.id,
-    channel: "Pos-procedimento",
-    return_type: "pos_procedimento",
-    summary,
-    waiting_patient_response: false,
-    next_action: `Acompanhar pos-procedimento: ${procedureName}`,
-    next_contact_at: new Date(nextContactAt).toISOString(),
+  const firstContactDate = new Date(nextContactAt);
+  const followUps = Array.from({ length: followUpDays }, (_, index) => {
+    const scheduledAt = new Date(firstContactDate);
+    scheduledAt.setDate(firstContactDate.getDate() + index);
+
+    const dayNumber = index + 1;
+    const summary = [
+      `Acompanhamento pos-procedimento D+${dayNumber}: ${procedureName}.`,
+      baseSummary || null,
+    ]
+      .filter(Boolean)
+      .join(" ");
+
+    return {
+      patient_id: patientId,
+      contacted_by: user.id,
+      channel: "Pos-procedimento",
+      return_type: "pos_procedimento",
+      summary,
+      waiting_patient_response: false,
+      next_action: `D+${dayNumber} - acompanhar recuperacao: ${procedureName}`,
+      next_contact_at: scheduledAt.toISOString(),
+    };
   });
 
+  const { error: contactError } = await supabase
+    .from("contact_logs")
+    .insert(followUps);
+
   if (contactError) {
-    return { message: "Procedimento salvo, mas nao foi possivel agendar o retorno." };
+    return {
+      message: "Procedimento salvo, mas nao foi possivel agendar os retornos.",
+    };
   }
 
   revalidatePath("/crm");
