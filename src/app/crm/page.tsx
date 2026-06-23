@@ -93,15 +93,22 @@ export default async function CrmPage() {
             Proxima etapa
           </p>
           <h2 className="mt-2 text-2xl font-semibold">
-            Primeiros modulos do CRM.
+            Operacao comercial do dia.
           </h2>
           <p className="mt-3 max-w-3xl leading-7 text-[#5d5248]">
-            O login real ja esta conectado ao Supabase. Comece cadastrando os
-            pacientes para, em seguida, registrar contatos, propostas e retornos.
+            Use a central comercial para registrar contatos e oportunidades em
+            uma unica tela. A ficha completa do paciente continua disponivel
+            para consulta detalhada.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link
               className="inline-flex h-10 items-center rounded-lg bg-[#333333] px-4 text-sm font-semibold text-[#f5f3e7] transition hover:bg-[#4a4037]"
+              href="/crm/atendimento"
+            >
+              Abrir central comercial
+            </Link>
+            <Link
+              className="inline-flex h-10 items-center rounded-lg border border-[#dfd7cc] px-4 text-sm font-semibold transition hover:bg-[#f5f3e7]"
               href="/crm/pacientes"
             >
               Cadastrar pacientes
