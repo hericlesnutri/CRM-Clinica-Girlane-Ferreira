@@ -48,7 +48,12 @@ export default async function PatientsPage() {
               {patients.map((patient) => (
                 <article key={patient.id} className="grid gap-3 px-5 py-4 md:grid-cols-[1.2fr_1fr_1fr]">
                   <div>
-                    <h3 className="font-semibold">{patient.name}</h3>
+                    <Link
+                      className="font-semibold transition hover:text-[#9e7f60]"
+                      href={`/crm/pacientes/${patient.id}`}
+                    >
+                      {patient.name}
+                    </Link>
                     <p className="mt-1 text-sm text-[#5d5248]">{patient.phone}</p>
                   </div>
                   <div>
@@ -68,6 +73,14 @@ export default async function PatientsPage() {
                       {patient.notes}
                     </p>
                   ) : null}
+                  <div className="md:col-span-3">
+                    <Link
+                      className="inline-flex h-9 items-center rounded-lg border border-[#dfd7cc] px-3 text-sm font-medium transition hover:bg-[#f5f3e7]"
+                      href={`/crm/pacientes/${patient.id}`}
+                    >
+                      Abrir ficha
+                    </Link>
+                  </div>
                 </article>
               ))}
             </div>
