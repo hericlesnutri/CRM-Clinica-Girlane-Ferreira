@@ -1,28 +1,19 @@
 import { CalendarDays, DollarSign, PhoneCall, UsersRound } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { signOut } from "@/app/auth/actions";
 import { requireUser } from "@/lib/auth/require-user";
 
 type Profile = {
-  full_name: string;
-  email: string | null;
   role: "admin" | "recepcionista" | "comercial";
 };
 
-const roleLabels: Record<Profile["role"], string> = {
-  admin: "Administrador",
-  recepcionista: "Recepcionista",
-  comercial: "Comercial",
-};
-
 export default async function CrmPage() {
-  const { supabase, user } = await requireUser();
+  const { supabase, user: _user } = await requireUser();
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name, email, role")
-    .eq("id", user.id)
+    .select("role")
+    .eq("id", _user.id)
     .single<Profile>();
 
   const [
@@ -58,35 +49,7 @@ export default async function CrmPage() {
     }, 0) ?? 0;
 
   return (
-    <main className="min-h-screen bg-[var(--brand-offwhite)] text-[var(--brand-dark)]">
-      <header className="border-b border-[#dfd7cc] bg-white">
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm font-medium uppercase tracking-[0.18em] text-[#9e7f60]">
-              CRM Girlane Ferreira
-            </p>
-            <h1 className="mt-1 text-2xl font-semibold">Painel comercial</h1>
-          </div>
-
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <div className="text-sm sm:text-right">
-              <p className="font-medium">{profile?.full_name ?? user.email}</p>
-              <p className="text-[#5d5248]">
-                {profile?.role ? roleLabels[profile.role] : "Perfil em configuracao"}
-              </p>
-            </div>
-            <form action={signOut}>
-              <button
-                className="h-10 rounded-lg border border-[#dfd7cc] px-4 text-sm font-medium transition hover:bg-[#f5f3e7]"
-                type="submit"
-              >
-                Sair
-              </button>
-            </form>
-          </div>
-        </div>
-      </header>
-
+    <main>
       <section className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-6 py-8">
         <div className="rounded-lg border border-[#dfd7cc] bg-white p-6">
           <p className="text-sm font-medium uppercase tracking-[0.16em] text-[#9e7f60]">

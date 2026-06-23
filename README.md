@@ -54,6 +54,8 @@ Depois de criar o usuario, ajuste o perfil na tabela `profiles`:
 O CRM usa a rota `/login` para entrada e `/crm` para o painel protegido.
 Administradores podem acessar `/crm/admin` para ajustar nome e perfil dos
 usuarios ja criados no Supabase Auth.
+As telas internas do CRM usam um menu compartilhado com atalhos principais,
+barra horizontal responsiva para mobile e botao de sair.
 
 ## Rotas atuais
 
