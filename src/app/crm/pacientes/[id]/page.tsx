@@ -140,9 +140,12 @@ export default async function PatientDetailsPage({
           </div>
 
           {opportunities?.length ? (
-            <div className="divide-y divide-[#dfd7cc]">
+            <div className="grid gap-3 bg-[#f8f6ee] p-3">
               {opportunities.map((opportunity) => (
-                <article key={opportunity.id} className="px-5 py-4">
+                <article
+                  key={opportunity.id}
+                  className="rounded-lg border border-amber-300 bg-amber-50 p-4"
+                >
                   <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
                     <div>
                       <h3 className="font-semibold">{opportunity.suggested_procedure}</h3>
@@ -152,7 +155,7 @@ export default async function PatientDetailsPage({
                         {opportunity.profiles?.full_name ?? "Equipe"}
                       </p>
                     </div>
-                    <span className="w-fit rounded-full bg-[#dfd7cc] px-3 py-1 text-xs font-medium text-[#333333]">
+                    <span className="w-fit rounded-full bg-amber-200 px-3 py-1 text-xs font-medium text-amber-900">
                       {opportunityStatusLabels[opportunity.status] ?? opportunity.status}
                     </span>
                   </div>
@@ -209,14 +212,17 @@ export default async function PatientDetailsPage({
           </div>
 
           {contactLogs?.length ? (
-            <div className="divide-y divide-[#dfd7cc]">
-              {contactLogs.map((contact) => (
-                <article key={contact.id} className="px-5 py-4">
+            <div className="grid gap-3 bg-[#f8f6ee] p-3">
+              {contactLogs.map((contact) => {
+                const { mainText, completionText } = splitCompletionNote(contact.summary);
+
+                return (
+                <article key={contact.id} className={contactCardClassName(contact)}>
                   <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="font-semibold">{contact.channel}</p>
-                        <span className="rounded-full bg-[#dfd7cc] px-3 py-1 text-xs font-medium text-[#333333]">
+                        <span className={contactBadgeClassName(contact)}>
                           {contactReturnTypeLabels[contact.return_type] ?? "Comercial"}
                         </span>
                       </div>
@@ -232,7 +238,18 @@ export default async function PatientDetailsPage({
                     ) : null}
                   </div>
 
-                  <p className="mt-4 text-sm leading-6">{contact.summary}</p>
+                  <p className="mt-4 whitespace-pre-line text-sm leading-6">{mainText}</p>
+
+                  {completionText ? (
+                    <div className="mt-4 rounded-lg border border-[#9e7f60]/30 bg-white/80 p-3">
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#9e7f60]">
+                        Conclusao do retorno
+                      </p>
+                      <p className="mt-2 whitespace-pre-line text-sm leading-6">
+                        {completionText}
+                      </p>
+                    </div>
+                  ) : null}
 
                   <div className="mt-4 grid gap-3 text-sm md:grid-cols-3">
                     <InfoItem
@@ -253,7 +270,8 @@ export default async function PatientDetailsPage({
                     />
                   </div>
                 </article>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="px-5 py-10 text-center text-sm text-[#5d5248]">
@@ -275,4 +293,42 @@ function InfoItem({ label, value }: { label: string; value: string }) {
       <p className="mt-1 text-sm text-[#5d5248]">{value}</p>
     </div>
   );
+}
+
+function splitCompletionNote(summary: string) {
+  const marker = "Conclusao do retorno:";
+  const [mainText, completionText] = summary.split(marker);
+
+  return {
+    mainText: mainText.trim(),
+    completionText: completionText?.trim() ?? "",
+  };
+}
+
+function contactCardClassName(contact: ContactLog) {
+  const base = "rounded-lg border p-4";
+
+  if (contact.return_type === "pos_procedimento") {
+    return `${base} border-emerald-300 bg-emerald-50`;
+  }
+
+  if (contact.return_type === "aguardando_retorno" || contact.waiting_patient_response) {
+    return `${base} border-sky-300 bg-sky-50`;
+  }
+
+  return `${base} border-[#dfd7cc] bg-white`;
+}
+
+function contactBadgeClassName(contact: ContactLog) {
+  const base = "rounded-full px-3 py-1 text-xs font-medium";
+
+  if (contact.return_type === "pos_procedimento") {
+    return `${base} bg-emerald-200 text-emerald-900`;
+  }
+
+  if (contact.return_type === "aguardando_retorno" || contact.waiting_patient_response) {
+    return `${base} bg-sky-200 text-sky-900`;
+  }
+
+  return `${base} bg-[#dfd7cc] text-[#333333]`;
 }

@@ -71,6 +71,9 @@ O acompanhamento pos-procedimento cria uma sequencia de lembretes diarios para
 acompanhar a recuperacao do paciente nos dias seguintes ao procedimento. A
 agenda mostra apenas o proximo lembrete pendente de cada sequencia.
 
+Na ficha do paciente, oportunidades e contatos tambem usam cores por funcao, e
+as conclusoes registradas na agenda aparecem destacadas no historico.
+
 ## Vercel
 
 1. Envie este repositorio para o GitHub.
