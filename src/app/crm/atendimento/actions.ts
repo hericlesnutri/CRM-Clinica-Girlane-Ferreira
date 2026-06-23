@@ -38,13 +38,17 @@ export async function createQuickPatient(
     return { message: "Ja existe um paciente cadastrado com este telefone." };
   }
 
-  const { error } = await supabase.from("patients").insert({
-    name,
-    phone,
-    lead_source: leadSource || null,
-    main_interest: mainInterest || null,
-    created_by: user.id,
-  });
+  const { data: patient, error } = await supabase
+    .from("patients")
+    .insert({
+      name,
+      phone,
+      lead_source: leadSource || null,
+      main_interest: mainInterest || null,
+      created_by: user.id,
+    })
+    .select("id")
+    .single();
 
   if (error) {
     if (error.code === "23505") {
@@ -57,7 +61,7 @@ export async function createQuickPatient(
   revalidatePath("/crm");
   revalidatePath("/crm/atendimento");
   revalidatePath("/crm/pacientes");
-  redirect("/crm/atendimento?salvo=paciente");
+  redirect(`/crm/atendimento?salvo=paciente&paciente=${patient.id}`);
 }
 
 export async function createQuickContact(
@@ -97,7 +101,7 @@ export async function createQuickContact(
   revalidatePath("/crm");
   revalidatePath("/crm/atendimento");
   revalidatePath(`/crm/pacientes/${patientId}`);
-  redirect("/crm/atendimento?salvo=contato");
+  redirect(`/crm/atendimento?salvo=contato&paciente=${patientId}`);
 }
 
 export async function createQuickOpportunity(
@@ -143,7 +147,7 @@ export async function createQuickOpportunity(
   revalidatePath("/crm");
   revalidatePath("/crm/atendimento");
   revalidatePath(`/crm/pacientes/${patientId}`);
-  redirect("/crm/atendimento?salvo=oportunidade");
+  redirect(`/crm/atendimento?salvo=oportunidade&paciente=${patientId}`);
 }
 
 export async function createPostProcedureFollowUp(
@@ -230,7 +234,7 @@ export async function createPostProcedureFollowUp(
   revalidatePath("/crm/agenda");
   revalidatePath("/crm/atendimento");
   revalidatePath(`/crm/pacientes/${patientId}`);
-  redirect("/crm/atendimento?salvo=pos_procedimento");
+  redirect(`/crm/atendimento?salvo=pos_procedimento&paciente=${patientId}`);
 }
 
 export async function createCommercialRecord(
