@@ -54,7 +54,7 @@ create trigger on_auth_user_created
 create table public.patients (
   id uuid primary key default gen_random_uuid(),
   name text not null,
-  phone text not null,
+  phone text not null unique,
   lead_source text,
   main_interest text,
   notes text,

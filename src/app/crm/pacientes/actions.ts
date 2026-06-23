@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/require-user";
 
+const brazilianPhonePattern = /^\+55 \(\d{2}\) 9 \d{4}-\d{4}$/;
+
 export type PatientFormState = {
   message?: string;
 };
@@ -22,7 +24,23 @@ export async function createPatient(
     return { message: "Nome e telefone sao obrigatorios." };
   }
 
+  if (!brazilianPhonePattern.test(phone)) {
+    return {
+      message: "Use o telefone no formato brasileiro: +55 (47) 9 9999-9999.",
+    };
+  }
+
   const { supabase, user } = await requireUser();
+
+  const { data: existingPatient } = await supabase
+    .from("patients")
+    .select("id")
+    .eq("phone", phone)
+    .maybeSingle();
+
+  if (existingPatient) {
+    return { message: "Ja existe um paciente cadastrado com este telefone." };
+  }
 
   const { error } = await supabase.from("patients").insert({
     name,
@@ -34,6 +52,10 @@ export async function createPatient(
   });
 
   if (error) {
+    if (error.code === "23505") {
+      return { message: "Ja existe um paciente cadastrado com este telefone." };
+    }
+
     return { message: "Nao foi possivel cadastrar o paciente." };
   }
 

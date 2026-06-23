@@ -1,12 +1,13 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { createPatient, type PatientFormState } from "./actions";
 
 const initialState: PatientFormState = {};
 
 export function PatientForm() {
   const [state, formAction, isPending] = useActionState(createPatient, initialState);
+  const [phone, setPhone] = useState("");
 
   return (
     <form action={formAction} className="grid gap-4 rounded-lg border border-[#dfd7cc] bg-white p-5">
@@ -24,8 +25,15 @@ export function PatientForm() {
           Telefone / WhatsApp
           <input
             className="h-11 rounded-lg border border-[#dfd7cc] px-3 outline-none transition focus:border-[#9e7f60] focus:ring-2 focus:ring-[#dfd7cc]"
+            inputMode="tel"
+            maxLength={21}
             name="phone"
+            onChange={(event) => setPhone(formatBrazilianPhone(event.target.value))}
+            pattern="\+55 \([0-9]{2}\) 9 [0-9]{4}-[0-9]{4}"
+            placeholder="+55 (47) 9 9999-9999"
             required
+            title="Use o formato +55 (47) 9 9999-9999"
+            value={phone}
           />
         </label>
       </div>
@@ -74,4 +82,36 @@ export function PatientForm() {
       </button>
     </form>
   );
+}
+
+function formatBrazilianPhone(value: string) {
+  const digits = value.replace(/\D/g, "").replace(/^55/, "").slice(0, 11);
+  const ddd = digits.slice(0, 2);
+  const ninthDigit = digits.slice(2, 3);
+  const firstPart = digits.slice(3, 7);
+  const secondPart = digits.slice(7, 11);
+
+  let formatted = "+55";
+
+  if (ddd) {
+    formatted += ` (${ddd}`;
+  }
+
+  if (ddd.length === 2) {
+    formatted += ")";
+  }
+
+  if (ninthDigit) {
+    formatted += ` ${ninthDigit}`;
+  }
+
+  if (firstPart) {
+    formatted += ` ${firstPart}`;
+  }
+
+  if (secondPart) {
+    formatted += `-${secondPart}`;
+  }
+
+  return formatted;
 }
