@@ -58,7 +58,7 @@ O CRM usa a rota `/login` para entrada e `/crm` para o painel protegido.
 - `/` pagina inicial
 - `/login` acesso da equipe
 - `/crm` painel protegido com metricas iniciais
-- `/crm/atendimento` central comercial para registrar contato ou oportunidade em uma unica tela
+- `/crm/atendimento` central comercial para cadastrar paciente, contato ou oportunidade em uma unica tela
 - `/crm/pacientes` cadastro e listagem de pacientes
 - `/crm/pacientes/[id]` ficha do paciente, oportunidades e historico de contatos
 

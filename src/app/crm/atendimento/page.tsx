@@ -45,36 +45,24 @@ export default async function CommercialDeskPage({
             className="inline-flex h-10 items-center justify-center rounded-lg border border-[#dfd7cc] bg-white px-4 text-sm font-medium transition hover:bg-[#f5f3e7]"
             href="/crm/pacientes"
           >
-            Cadastrar novo paciente
+            Ver lista de pacientes
           </Link>
         </div>
 
         {salvo ? (
           <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
-            {salvo === "oportunidade"
-              ? "Oportunidade registrada com sucesso."
-              : "Contato registrado com sucesso."}
+            {successMessages[salvo] ?? "Registro salvo com sucesso."}
           </div>
         ) : null}
 
-        {patients?.length ? (
-          <QuickForms patients={patients} />
-        ) : (
-          <div className="rounded-lg border border-[#dfd7cc] bg-white px-5 py-10 text-center">
-            <h2 className="text-xl font-semibold">Cadastre o primeiro paciente</h2>
-            <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-[#5d5248]">
-              Para registrar contatos ou oportunidades, primeiro precisamos ter
-              ao menos um paciente cadastrado.
-            </p>
-            <Link
-              className="mt-5 inline-flex h-10 items-center rounded-lg bg-[#333333] px-4 text-sm font-semibold text-[#f5f3e7]"
-              href="/crm/pacientes"
-            >
-              Ir para pacientes
-            </Link>
-          </div>
-        )}
+        <QuickForms patients={patients ?? []} />
       </section>
     </main>
   );
 }
+
+const successMessages: Record<string, string> = {
+  paciente: "Paciente cadastrado com sucesso.",
+  contato: "Contato registrado com sucesso.",
+  oportunidade: "Oportunidade registrada com sucesso.",
+};

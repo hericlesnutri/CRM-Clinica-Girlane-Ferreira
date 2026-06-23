@@ -8,6 +8,58 @@ export type QuickActionState = {
   message?: string;
 };
 
+const brazilianPhonePattern = /^\+55 \(\d{2}\) 9 \d{4}-\d{4}$/;
+
+export async function createQuickPatient(
+  _previousState: QuickActionState,
+  formData: FormData,
+): Promise<QuickActionState> {
+  const name = String(formData.get("name") ?? "").trim();
+  const phone = String(formData.get("phone") ?? "").trim();
+  const leadSource = String(formData.get("lead_source") ?? "").trim();
+  const mainInterest = String(formData.get("main_interest") ?? "").trim();
+
+  if (!name || !phone) {
+    return { message: "Nome e telefone sao obrigatorios." };
+  }
+
+  if (!brazilianPhonePattern.test(phone)) {
+    return { message: "Use o telefone no formato +55 (47) 9 9999-9999." };
+  }
+
+  const { supabase, user } = await requireUser();
+  const { data: existingPatient } = await supabase
+    .from("patients")
+    .select("id")
+    .eq("phone", phone)
+    .maybeSingle();
+
+  if (existingPatient) {
+    return { message: "Ja existe um paciente cadastrado com este telefone." };
+  }
+
+  const { error } = await supabase.from("patients").insert({
+    name,
+    phone,
+    lead_source: leadSource || null,
+    main_interest: mainInterest || null,
+    created_by: user.id,
+  });
+
+  if (error) {
+    if (error.code === "23505") {
+      return { message: "Ja existe um paciente cadastrado com este telefone." };
+    }
+
+    return { message: "Nao foi possivel cadastrar o paciente." };
+  }
+
+  revalidatePath("/crm");
+  revalidatePath("/crm/atendimento");
+  revalidatePath("/crm/pacientes");
+  redirect("/crm/atendimento?salvo=paciente");
+}
+
 export async function createQuickContact(
   _previousState: QuickActionState,
   formData: FormData,

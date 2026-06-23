@@ -1,9 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import {
   createQuickContact,
   createQuickOpportunity,
+  createQuickPatient,
   type QuickActionState,
 } from "./actions";
 
@@ -16,6 +17,11 @@ type PatientOption = {
 const initialState: QuickActionState = {};
 
 export function QuickForms({ patients }: { patients: PatientOption[] }) {
+  const [phone, setPhone] = useState("");
+  const [patientState, patientAction, isPatientPending] = useActionState(
+    createQuickPatient,
+    initialState,
+  );
   const [contactState, contactAction, isContactPending] = useActionState(
     createQuickContact,
     initialState,
@@ -26,7 +32,57 @@ export function QuickForms({ patients }: { patients: PatientOption[] }) {
   );
 
   return (
-    <div className="grid gap-5 xl:grid-cols-2">
+    <div className="grid gap-5">
+      <form action={patientAction} className="grid gap-4 rounded-lg border border-[#dfd7cc] bg-white p-5">
+        <div>
+          <h2 className="text-xl font-semibold">Cadastrar paciente rapido</h2>
+          <p className="mt-1 text-sm text-[#5d5248]">
+            Use quando o paciente ainda nao existir no CRM.
+          </p>
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-4">
+          <label className="flex flex-col gap-2 text-sm font-medium lg:col-span-1">
+            Nome
+            <input className={fieldClassName} name="name" required />
+          </label>
+
+          <label className="flex flex-col gap-2 text-sm font-medium lg:col-span-1">
+            Telefone / WhatsApp
+            <input
+              className={fieldClassName}
+              inputMode="tel"
+              maxLength={21}
+              name="phone"
+              onChange={(event) => setPhone(formatBrazilianPhone(event.target.value))}
+              pattern="\+55 \([0-9]{2}\) 9 [0-9]{4}-[0-9]{4}"
+              placeholder="+55 (47) 9 9999-9999"
+              required
+              title="Use o formato +55 (47) 9 9999-9999"
+              value={phone}
+            />
+          </label>
+
+          <label className="flex flex-col gap-2 text-sm font-medium">
+            Origem
+            <input className={fieldClassName} name="lead_source" placeholder="Instagram, WhatsApp..." />
+          </label>
+
+          <label className="flex flex-col gap-2 text-sm font-medium">
+            Interesse
+            <input className={fieldClassName} name="main_interest" placeholder="Rugas, papada, emagrecimento..." />
+          </label>
+        </div>
+
+        {patientState.message ? <FormError message={patientState.message} /> : null}
+
+        <button className={buttonClassName} disabled={isPatientPending} type="submit">
+          {isPatientPending ? "Cadastrando..." : "Cadastrar paciente"}
+        </button>
+      </form>
+
+      {patients.length ? (
+        <div className="grid gap-5 xl:grid-cols-2">
       <form action={contactAction} className="grid gap-4 rounded-lg border border-[#dfd7cc] bg-white p-5">
         <div>
           <h2 className="text-xl font-semibold">Registrar contato</h2>
@@ -152,6 +208,13 @@ export function QuickForms({ patients }: { patients: PatientOption[] }) {
           {isOpportunityPending ? "Salvando..." : "Salvar oportunidade"}
         </button>
       </form>
+        </div>
+      ) : (
+        <div className="rounded-lg border border-[#dfd7cc] bg-white px-5 py-8 text-center text-sm text-[#5d5248]">
+          Cadastre o primeiro paciente acima para liberar os registros de contato
+          e oportunidade.
+        </div>
+      )}
     </div>
   );
 }
@@ -187,3 +250,35 @@ const fieldClassName =
 
 const buttonClassName =
   "h-11 rounded-lg bg-[#333333] px-5 font-semibold text-[#f5f3e7] transition hover:bg-[#4a4037] disabled:cursor-not-allowed disabled:opacity-70 md:w-fit";
+
+function formatBrazilianPhone(value: string) {
+  const digits = value.replace(/\D/g, "").replace(/^55/, "").slice(0, 11);
+  const ddd = digits.slice(0, 2);
+  const ninthDigit = digits.slice(2, 3);
+  const firstPart = digits.slice(3, 7);
+  const secondPart = digits.slice(7, 11);
+
+  let formatted = "+55";
+
+  if (ddd) {
+    formatted += ` (${ddd}`;
+  }
+
+  if (ddd.length === 2) {
+    formatted += ")";
+  }
+
+  if (ninthDigit) {
+    formatted += ` ${ninthDigit}`;
+  }
+
+  if (firstPart) {
+    formatted += ` ${firstPart}`;
+  }
+
+  if (secondPart) {
+    formatted += `-${secondPart}`;
+  }
+
+  return formatted;
+}
