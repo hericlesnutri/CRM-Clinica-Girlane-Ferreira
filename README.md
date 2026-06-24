@@ -23,6 +23,9 @@ Crie um arquivo `.env.local` baseado em `.env.example`:
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+INSTAGRAM_WEBHOOK_VERIFY_TOKEN=
+INSTAGRAM_APP_SECRET=
 ```
 
 Rode o projeto:
@@ -65,6 +68,7 @@ barra superior no desktop, navegação inferior no mobile e botao de sair.
 - `/crm/admin` administracao da equipe e perfis de acesso, visivel apenas para admin
 - `/crm/atendimento` central comercial com cadastro rapido de paciente, busca por nome/telefone e formulario unico para contato, oportunidade ou acompanhamento pos-procedimento
 - `/crm/agenda` agenda de retornos comerciais atrasados, de hoje e proximos
+- `/crm/instagram` cards automaticos de mensagens recebidas pelo Direct do Instagram
 - `/crm/oportunidades` funil/kanban de oportunidades por status, valor em aberto e acoes comerciais rapidas
 - `/crm/pacientes` cadastro e listagem pesquisavel de pacientes
 - `/crm/pacientes/[id]` ficha editavel do paciente, ultimo procedimento, oportunidades e historico de contatos
@@ -90,6 +94,20 @@ data, o card continua o acompanhamento; sem data, o retorno e encerrado.
 
 A ficha do paciente permite editar nome, telefone, origem, interesse principal e
 observacoes sem reabrir formulários de contato ou oportunidade.
+
+## Instagram
+
+A integracao inicial com Instagram recebe webhooks da Meta em
+`/api/webhooks/instagram` e cria cards em `/crm/instagram`. O contato continua
+sendo feito pelo Direct do Instagram.
+
+Para ativar:
+
+1. Execute `supabase/migrations/006_instagram_inbox.sql` no Supabase.
+2. Cadastre `SUPABASE_SERVICE_ROLE_KEY` na Vercel usando a service role key do Supabase.
+3. Cadastre `INSTAGRAM_WEBHOOK_VERIFY_TOKEN` na Vercel e use o mesmo texto no painel da Meta.
+4. Opcional, mas recomendado: cadastre `INSTAGRAM_APP_SECRET` na Vercel para validar a assinatura dos webhooks.
+5. Na Meta, configure o callback como `https://SEU_DOMINIO/api/webhooks/instagram`.
 
 ## Vercel
 

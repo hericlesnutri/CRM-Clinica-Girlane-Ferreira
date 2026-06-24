@@ -5,6 +5,7 @@ import {
   CalendarDays,
   LayoutDashboard,
   LogOut,
+  MessageCircle,
   Settings,
   Sparkles,
   UserRoundPlus,
@@ -36,6 +37,7 @@ const navItems = [
   { href: "/crm", icon: LayoutDashboard, label: "Painel" },
   { href: "/crm/atendimento", icon: UserRoundPlus, label: "Atendimento" },
   { href: "/crm/agenda", icon: CalendarDays, label: "Agenda" },
+  { href: "/crm/instagram", icon: MessageCircle, label: "Instagram" },
   { href: "/crm/oportunidades", icon: Sparkles, label: "Funil" },
   { href: "/crm/pacientes", icon: UsersRound, label: "Pacientes" },
   { href: "/crm/relatorios", icon: BarChart3, label: "Relatorios" },
@@ -48,7 +50,7 @@ export function CrmShell({ children, profile, userEmail }: CrmShellProps) {
     return !item.adminOnly || profile?.role === "admin";
   });
   const mobileNavItems = visibleNavItems.filter((item) => {
-    return ["/crm", "/crm/atendimento", "/crm/agenda", "/crm/oportunidades", "/crm/pacientes"].includes(
+    return ["/crm/atendimento", "/crm/instagram", "/crm/agenda", "/crm/oportunidades", "/crm/pacientes"].includes(
       item.href,
     );
   });
