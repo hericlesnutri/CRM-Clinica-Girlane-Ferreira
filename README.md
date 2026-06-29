@@ -26,6 +26,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 INSTAGRAM_WEBHOOK_VERIFY_TOKEN=
 INSTAGRAM_APP_SECRET=
+WHATSAPP_WEBHOOK_VERIFY_TOKEN=
+WHATSAPP_APP_SECRET=
 ```
 
 Rode o projeto:
@@ -73,6 +75,7 @@ barra superior no desktop, navegação inferior no mobile e botao de sair.
 - `/crm/pacientes` cadastro e listagem pesquisavel de pacientes
 - `/crm/pacientes/[id]` ficha editavel do paciente, ultimo procedimento, oportunidades e historico de contatos
 - `/crm/relatorios` indicadores simples de valor em aberto, valor fechado, conversao, contatos e retornos
+- `/crm/whatsapp` cards automaticos de mensagens recebidas pelo WhatsApp Cloud API
 
 O funil de oportunidades organiza propostas por etapa: aberta, proposta
 enviada, aguardando retorno, fechada e perdida. Os cards mostram paciente,
@@ -108,6 +111,21 @@ Para ativar:
 3. Cadastre `INSTAGRAM_WEBHOOK_VERIFY_TOKEN` na Vercel e use o mesmo texto no painel da Meta.
 4. Opcional, mas recomendado: cadastre `INSTAGRAM_APP_SECRET` na Vercel para validar a assinatura dos webhooks.
 5. Na Meta, configure o callback como `https://SEU_DOMINIO/api/webhooks/instagram`.
+
+## WhatsApp
+
+A integracao inicial com WhatsApp recebe webhooks da Meta em
+`/api/webhooks/whatsapp` e cria cards em `/crm/whatsapp`. O contato continua
+sendo feito pelo WhatsApp ou WhatsApp Web.
+
+Para ativar:
+
+1. Execute `supabase/migrations/007_whatsapp_inbox.sql` no Supabase.
+2. Cadastre `SUPABASE_SERVICE_ROLE_KEY` na Vercel usando a service role key do Supabase.
+3. Cadastre `WHATSAPP_WEBHOOK_VERIFY_TOKEN` na Vercel e use o mesmo texto no painel da Meta.
+4. Opcional, mas recomendado: cadastre `WHATSAPP_APP_SECRET` na Vercel para validar a assinatura dos webhooks.
+5. Na Meta, configure o callback como `https://SEU_DOMINIO/api/webhooks/whatsapp`.
+6. Assine o campo/evento `messages` do WhatsApp.
 
 ## Vercel
 
