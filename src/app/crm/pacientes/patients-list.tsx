@@ -30,8 +30,8 @@ export function PatientsList({ patients }: { patients: Patient[] }) {
   }, [patients, search]);
 
   return (
-    <section className="rounded-lg border border-[#dfd7cc] bg-white">
-      <div className="grid gap-4 border-b border-[#dfd7cc] px-5 py-4 md:grid-cols-[1fr_20rem] md:items-center">
+    <section className="rounded-lg border border-[#ead8c8] bg-[#fffdf8] shadow-sm">
+      <div className="grid gap-4 border-b border-[#ead8c8] bg-[#fff0ea]/60 px-5 py-4 md:grid-cols-[1fr_20rem] md:items-center">
         <div>
           <h2 className="font-semibold">Pacientes cadastrados</h2>
           <p className="mt-1 text-sm text-[#5d5248]">
@@ -42,7 +42,7 @@ export function PatientsList({ patients }: { patients: Patient[] }) {
         <label className="flex flex-col gap-2 text-sm font-medium">
           Buscar
           <input
-            className="h-11 rounded-lg border border-[#dfd7cc] px-3 outline-none transition focus:border-[#9e7f60] focus:ring-2 focus:ring-[#dfd7cc]"
+            className="h-11 rounded-lg border border-[#ead8c8] bg-white px-3 outline-none transition focus:border-[#c96f61] focus:ring-2 focus:ring-[#f1c9bf]"
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Nome ou telefone"
             value={search}
@@ -51,9 +51,9 @@ export function PatientsList({ patients }: { patients: Patient[] }) {
       </div>
 
       {filteredPatients.length ? (
-        <div className="divide-y divide-[#dfd7cc]">
+        <div className="divide-y divide-[#f1e1d4]">
           {filteredPatients.map((patient) => (
-            <article key={patient.id} className="grid gap-3 px-5 py-4 md:grid-cols-[1.2fr_1fr_1fr]">
+            <article key={patient.id} className="grid gap-3 px-5 py-4 transition hover:bg-[#fff8f2] md:grid-cols-[1.2fr_1fr_1fr]">
               <div>
                 <Link
                   className="font-semibold transition hover:text-[#9e7f60]"

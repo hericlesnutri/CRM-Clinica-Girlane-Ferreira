@@ -1,12 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f5f3e7;
+  --background: #fff8f2;
   --foreground: #333333;
   --brand-brown: #9e7f60;
   --brand-cappuccino: #dfd7cc;
-  --brand-offwhite: #f5f3e7;
+  --brand-offwhite: #fff8f2;
   --brand-dark: #333333;
+  --brand-blush: #f8d8d2;
+  --brand-rose: #c96f61;
+  --brand-sage: #dce8d5;
+  --brand-mint: #b8dcc8;
+  --brand-gold: #e7c77d;
+  --brand-lavender: #e7ddf3;
+  --brand-cream: #fffdf8;
 }
 
 @theme inline {
@@ -17,7 +24,10 @@
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(circle at top left, rgba(248, 216, 210, 0.72), transparent 30rem),
+    radial-gradient(circle at top right, rgba(220, 232, 213, 0.72), transparent 34rem),
+    linear-gradient(180deg, #fffaf5 0%, #f7f0e6 100%);
   color: var(--foreground);
 }
 

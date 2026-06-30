@@ -31,7 +31,7 @@ export function QuickForms({ patients }: { patients: PatientOption[] }) {
 
   return (
     <div className="grid gap-5">
-      <form action={patientAction} className="grid gap-4 rounded-lg border border-[#dfd7cc] bg-white p-4 lg:p-5">
+      <form action={patientAction} className="grid gap-4 rounded-lg border border-[#f1c9bf] bg-[#fffdf8] p-4 shadow-sm lg:p-5">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#9e7f60]">
@@ -126,7 +126,7 @@ export function QuickForms({ patients }: { patients: PatientOption[] }) {
           </button>
         </form>
       ) : (
-        <div className="rounded-lg border border-[#dfd7cc] bg-white px-5 py-8 text-center text-sm text-[#5d5248]">
+        <div className="rounded-lg border border-[#f1c9bf] bg-[#fff0ea] px-5 py-8 text-center text-sm text-[#6a5148]">
           Cadastre o primeiro paciente acima para liberar os registros comerciais.
         </div>
       )}
@@ -317,8 +317,8 @@ function TypeButton({
     <button
       className={`rounded-lg border p-3 text-left transition ${
         active
-          ? "border-[#333333] bg-[#333333] text-[#f5f3e7]"
-          : "border-[#dfd7cc] bg-white hover:bg-[#f5f3e7]"
+          ? "border-[#c96f61] bg-[#c96f61] text-white shadow-sm"
+          : "border-[#ead8c8] bg-white hover:bg-[#fff0ea]"
       }`}
       onClick={onClick}
       type="button"
@@ -340,10 +340,10 @@ function FormError({ message }: { message: string }) {
 }
 
 const fieldClassName =
-  "h-11 rounded-lg border border-[#dfd7cc] bg-white px-3 outline-none transition focus:border-[#9e7f60] focus:ring-2 focus:ring-[#dfd7cc]";
+  "h-11 rounded-lg border border-[#ead8c8] bg-white px-3 outline-none transition focus:border-[#c96f61] focus:ring-2 focus:ring-[#f1c9bf]";
 
 const buttonClassName =
-  "h-11 rounded-lg bg-[#333333] px-5 font-semibold text-[#f5f3e7] transition hover:bg-[#4a4037] disabled:cursor-not-allowed disabled:opacity-70 md:w-fit";
+  "h-11 rounded-lg bg-[#c96f61] px-5 font-semibold text-white shadow-sm transition hover:bg-[#b85f52] disabled:cursor-not-allowed disabled:opacity-70 md:w-fit";
 
 const submitLabelByType: Record<RecordType, string> = {
   oportunidade: "Salvar oportunidade / venda",
@@ -354,14 +354,14 @@ function commercialFormClassName(recordType: RecordType) {
   const base = "grid gap-4 rounded-lg border p-4 lg:p-5";
 
   if (recordType === "oportunidade") {
-    return `${base} border-amber-300 bg-amber-50`;
+    return `${base} border-[#ead8a2] bg-[#fff7d9] shadow-sm`;
   }
 
   if (recordType === "pos_procedimento") {
-    return `${base} border-emerald-300 bg-emerald-50`;
+    return `${base} border-[#b8dcc8] bg-[#eef6e9] shadow-sm`;
   }
 
-  return `${base} border-[#dfd7cc] bg-white`;
+  return `${base} border-[#ead8c8] bg-white shadow-sm`;
 }
 
 function formatBrazilianPhone(value: string) {

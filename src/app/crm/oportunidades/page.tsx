@@ -93,7 +93,7 @@ export default async function OpportunitiesPage() {
           </div>
 
           <Link
-            className="inline-flex h-10 items-center justify-center rounded-lg bg-[#333333] px-4 text-sm font-semibold text-[#f5f3e7] transition hover:bg-[#4a4037]"
+            className="inline-flex h-10 items-center justify-center rounded-lg bg-[#c96f61] px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#b85f52]"
             href="/crm/atendimento"
           >
             Nova venda
@@ -134,7 +134,7 @@ export default async function OpportunitiesPage() {
 
 function SummaryCard({ label, value }: { label: string; value: string }) {
   return (
-    <article className="rounded-lg border border-[#dfd7cc] bg-white p-5">
+    <article className="rounded-lg border border-[#ead8c8] bg-[#fffdf8] p-5 shadow-sm">
       <p className="text-sm text-[#5d5248]">{label}</p>
       <p className="mt-3 text-2xl font-semibold">{value}</p>
     </article>
@@ -151,8 +151,8 @@ function FunnelColumn({
   totalValue: number;
 }) {
   return (
-    <section className="flex min-h-[30rem] flex-col rounded-lg border border-[#dfd7cc] bg-white">
-      <div className="border-b border-[#dfd7cc] px-3 py-3">
+    <section className={funnelColumnClassName(column.status)}>
+      <div className="border-b border-white/70 px-3 py-3">
         <div className="flex items-center justify-between gap-3">
           <h2 className="font-semibold">{column.title}</h2>
           <span className={countClassName(column.status)}>{items.length}</span>
@@ -164,13 +164,13 @@ function FunnelColumn({
       </div>
 
       {items.length ? (
-        <div className="flex flex-1 flex-col gap-2 bg-[#f8f6ee] p-2">
+        <div className="flex flex-1 flex-col gap-2 bg-white/45 p-2">
           {items.map((opportunity) => (
             <OpportunityCard key={opportunity.id} opportunity={opportunity} />
           ))}
         </div>
       ) : (
-        <div className="flex flex-1 items-center justify-center bg-[#f8f6ee] px-5 py-8 text-center text-sm text-[#5d5248]">
+        <div className="flex flex-1 items-center justify-center bg-white/45 px-5 py-8 text-center text-sm text-[#5d5248]">
           Nenhuma oportunidade nesta etapa.
         </div>
       )}
@@ -293,6 +293,19 @@ function cardClassName(status: OpportunityStatus) {
   }
 
   return `${base} border-amber-300 bg-amber-50`;
+}
+
+function funnelColumnClassName(status: OpportunityStatus) {
+  const base = "flex min-h-[30rem] flex-col rounded-lg border shadow-sm";
+  const tones: Record<OpportunityStatus, string> = {
+    aberta: "border-[#ead8a2] bg-[#fff7d9]",
+    proposta_enviada: "border-[#f1c9bf] bg-[#fff0ea]",
+    aguardando_retorno: "border-sky-200 bg-sky-50",
+    fechada: "border-[#b8dcc8] bg-[#eef6e9]",
+    perdida: "border-red-200 bg-red-50",
+  };
+
+  return `${base} ${tones[status]}`;
 }
 
 function finalCardClassName(status: OpportunityStatus) {

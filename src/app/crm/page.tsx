@@ -51,7 +51,7 @@ export default async function CrmPage() {
   return (
     <main>
       <section className="flex w-full flex-col gap-5 py-5 lg:py-0">
-        <div className="rounded-lg border border-[#dfd7cc] bg-white p-5 lg:p-6">
+        <div className="overflow-hidden rounded-lg border border-[#f1c9bf] bg-[linear-gradient(135deg,#fffdf8_0%,#fff0ea_58%,#eef6e9_100%)] p-5 shadow-sm lg:p-6">
           <p className="text-sm font-medium uppercase tracking-[0.16em] text-[#9e7f60]">
             Comece aqui
           </p>
@@ -65,32 +65,32 @@ export default async function CrmPage() {
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link
-              className="inline-flex h-10 items-center rounded-lg bg-[#333333] px-4 text-sm font-semibold text-[#f5f3e7] transition hover:bg-[#4a4037]"
+              className="inline-flex h-10 items-center rounded-lg bg-[#c96f61] px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#b85f52]"
               href="/crm/atendimento"
             >
               Novo atendimento
             </Link>
             <Link
-              className="inline-flex h-10 items-center rounded-lg border border-[#dfd7cc] px-4 text-sm font-semibold transition hover:bg-[#f5f3e7]"
+              className="inline-flex h-10 items-center rounded-lg border border-[#ead8c8] bg-white/70 px-4 text-sm font-semibold transition hover:bg-[#fff0ea]"
               href="/crm/agenda"
             >
               Ver retornos
             </Link>
             <Link
-              className="inline-flex h-10 items-center rounded-lg border border-[#dfd7cc] px-4 text-sm font-semibold transition hover:bg-[#f5f3e7]"
+              className="inline-flex h-10 items-center rounded-lg border border-[#ead8c8] bg-white/70 px-4 text-sm font-semibold transition hover:bg-[#fff0ea]"
               href="/crm/oportunidades"
             >
               Ver vendas
             </Link>
             <Link
-              className="inline-flex h-10 items-center rounded-lg border border-[#dfd7cc] px-4 text-sm font-semibold transition hover:bg-[#f5f3e7]"
+              className="inline-flex h-10 items-center rounded-lg border border-[#ead8c8] bg-white/70 px-4 text-sm font-semibold transition hover:bg-[#fff0ea]"
               href="/crm/pacientes"
             >
               Buscar paciente
             </Link>
             {profile?.role === "admin" ? (
               <Link
-                className="inline-flex h-10 items-center rounded-lg border border-[#dfd7cc] px-4 text-sm font-semibold transition hover:bg-[#f5f3e7]"
+                className="inline-flex h-10 items-center rounded-lg border border-[#ead8c8] bg-white/70 px-4 text-sm font-semibold transition hover:bg-[#fff0ea]"
                 href="/crm/admin"
               >
                 Equipe
@@ -101,21 +101,25 @@ export default async function CrmPage() {
 
         <div className="grid gap-4 md:grid-cols-4">
           <MetricCard
+            tone="rose"
             icon={<UsersRound aria-hidden className="size-5" />}
             label="Pacientes"
             value={String(patientsCount ?? 0)}
           />
           <MetricCard
+            tone="sage"
             icon={<PhoneCall aria-hidden className="size-5" />}
             label="Acompanhamentos"
             value={String(contactsCount ?? 0)}
           />
           <MetricCard
+            tone="gold"
             icon={<CalendarDays aria-hidden className="size-5" />}
             label="Retornos pendentes"
             value={String(pendingReturnsCount ?? 0)}
           />
           <MetricCard
+            tone="lavender"
             icon={<DollarSign aria-hidden className="size-5" />}
             label="Propostas abertas"
             value={openProposalValue.toLocaleString("pt-BR", {
@@ -132,21 +136,47 @@ export default async function CrmPage() {
 function MetricCard({
   icon,
   label,
+  tone,
   value,
 }: {
   icon: ReactNode;
   label: string;
+  tone: "gold" | "lavender" | "rose" | "sage";
   value: string;
 }) {
   return (
-    <article className="rounded-lg border border-[#dfd7cc] bg-white p-5">
+    <article className={metricCardClassName(tone)}>
       <div className="flex items-center justify-between gap-4">
         <p className="text-sm text-[#5d5248]">{label}</p>
-        <div className="flex size-9 items-center justify-center rounded-lg bg-[#dfd7cc] text-[#333333]">
+        <div className={metricIconClassName(tone)}>
           {icon}
         </div>
       </div>
       <p className="mt-5 text-2xl font-semibold">{value}</p>
     </article>
   );
+}
+
+function metricCardClassName(tone: "gold" | "lavender" | "rose" | "sage") {
+  const base = "rounded-lg border p-5 shadow-sm";
+  const tones = {
+    gold: "border-[#ead8a2] bg-[#fff7d9]",
+    lavender: "border-[#dacced] bg-[#f5effc]",
+    rose: "border-[#f1c9bf] bg-[#fff0ea]",
+    sage: "border-[#cfe0c8] bg-[#eef6e9]",
+  };
+
+  return `${base} ${tones[tone]}`;
+}
+
+function metricIconClassName(tone: "gold" | "lavender" | "rose" | "sage") {
+  const base = "flex size-9 items-center justify-center rounded-lg";
+  const tones = {
+    gold: "bg-[#e7c77d] text-[#5c4217]",
+    lavender: "bg-[#d7c5ef] text-[#463059]",
+    rose: "bg-[#f1b7ad] text-[#68342d]",
+    sage: "bg-[#b8dcc8] text-[#244635]",
+  };
+
+  return `${base} ${tones[tone]}`;
 }

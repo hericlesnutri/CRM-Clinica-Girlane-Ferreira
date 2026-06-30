@@ -97,7 +97,7 @@ export default async function AgendaPage() {
           </div>
 
           <Link
-            className="inline-flex h-10 items-center justify-center rounded-lg bg-[#333333] px-4 text-sm font-semibold text-[#f5f3e7] transition hover:bg-[#4a4037]"
+            className="inline-flex h-10 items-center justify-center rounded-lg bg-[#c96f61] px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#b85f52]"
             href="/crm/atendimento"
           >
             Novo atendimento
@@ -182,14 +182,14 @@ function AgendaColumn({
   tone?: "default" | "danger" | "strong";
 }) {
   return (
-    <section className="flex min-h-[24rem] flex-col rounded-lg border border-[#dfd7cc] bg-white">
-      <div className="flex items-center justify-between border-b border-[#dfd7cc] px-4 py-3">
+    <section className={agendaColumnClassName(tone)}>
+      <div className="flex items-center justify-between border-b border-white/60 px-4 py-3">
         <h2 className="font-semibold">{title}</h2>
         <span className={countClassName(tone)}>{items.length}</span>
       </div>
 
       {items.length ? (
-        <div className="flex flex-1 flex-col gap-2 bg-[#f8f6ee] p-2.5">
+        <div className="flex flex-1 flex-col gap-2 bg-white/45 p-2.5">
           {items.map((item) => (
             <article
               key={`${item.type}-${item.id}`}
@@ -242,7 +242,7 @@ function AgendaColumn({
           ))}
         </div>
       ) : (
-        <div className="flex flex-1 items-center justify-center bg-[#f8f6ee] px-5 py-8 text-center text-sm text-[#5d5248]">
+        <div className="flex flex-1 items-center justify-center bg-white/45 px-5 py-8 text-center text-sm text-[#5d5248]">
           Nenhum retorno nesta categoria.
         </div>
       )}
@@ -302,6 +302,20 @@ function cardClassName(
   }
 
   return `${base} border-[#dfd7cc] bg-white${overdue}`;
+}
+
+function agendaColumnClassName(tone: "default" | "danger" | "strong") {
+  const base = "flex min-h-[24rem] flex-col rounded-lg border shadow-sm";
+
+  if (tone === "danger") {
+    return `${base} border-red-200 bg-[#fff1f1]`;
+  }
+
+  if (tone === "strong") {
+    return `${base} border-[#f1c9bf] bg-[#fff0ea]`;
+  }
+
+  return `${base} border-[#cfe0c8] bg-[#eef6e9]`;
 }
 
 function badgeClassName(cardKind: AgendaItem["cardKind"]) {

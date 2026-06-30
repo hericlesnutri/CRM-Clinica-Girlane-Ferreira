@@ -36,7 +36,7 @@ export default async function PatientsPage() {
           </div>
 
           <Link
-            className="inline-flex h-10 items-center justify-center rounded-lg bg-[#333333] px-4 text-sm font-semibold text-[#f5f3e7] transition hover:bg-[#4a4037]"
+            className="inline-flex h-10 items-center justify-center rounded-lg bg-[#c96f61] px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#b85f52]"
             href="/crm/atendimento"
           >
             Novo paciente

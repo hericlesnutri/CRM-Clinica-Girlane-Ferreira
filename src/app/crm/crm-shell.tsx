@@ -59,7 +59,7 @@ export function CrmShell({ children, profile, userEmail }: CrmShellProps) {
 
   return (
     <div className="min-h-screen bg-[var(--brand-offwhite)] pb-20 text-[var(--brand-dark)] lg:pb-0">
-      <header className="sticky top-0 z-40 border-b border-[#dfd7cc] bg-white/95 backdrop-blur lg:fixed lg:inset-x-0">
+      <header className="sticky top-0 z-40 border-b border-[#ead8c8] bg-[rgba(255,253,248,0.88)] backdrop-blur lg:fixed lg:inset-x-0">
         <div
           className={`mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-3 transition-[padding] sm:px-6 ${
             isSidebarCollapsed ? "lg:pl-24" : "lg:pl-72"
@@ -76,7 +76,7 @@ export function CrmShell({ children, profile, userEmail }: CrmShellProps) {
 
           <div className="flex items-center gap-2">
             <Link
-              className="hidden h-10 items-center rounded-lg bg-[#333333] px-4 text-sm font-semibold text-[#f5f3e7] transition hover:bg-[#4a4037] sm:inline-flex"
+              className="hidden h-10 items-center rounded-lg bg-[#c96f61] px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#b85f52] sm:inline-flex"
               href="/crm/atendimento"
             >
               Novo atendimento
@@ -92,7 +92,7 @@ export function CrmShell({ children, profile, userEmail }: CrmShellProps) {
             <form action={signOut}>
               <button
                 aria-label="Sair"
-                className="inline-flex size-10 items-center justify-center rounded-lg border border-[#dfd7cc] text-sm font-medium transition hover:bg-[#f5f3e7] sm:w-auto sm:px-4"
+                className="inline-flex size-10 items-center justify-center rounded-lg border border-[#ead8c8] bg-white/80 text-sm font-medium transition hover:bg-[#fff0ea] sm:w-auto sm:px-4"
                 type="submit"
               >
                 <LogOut aria-hidden className="size-4" />
@@ -104,7 +104,7 @@ export function CrmShell({ children, profile, userEmail }: CrmShellProps) {
       </header>
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 hidden border-r border-[#dfd7cc] bg-white p-3 transition-[width] duration-200 lg:block ${
+        className={`fixed inset-y-0 left-0 z-50 hidden border-r border-[#ead8c8] bg-[linear-gradient(180deg,#fffdf8_0%,#fff3ec_52%,#f4f8ef_100%)] p-3 shadow-[8px_0_30px_rgba(158,127,96,0.10)] transition-[width] duration-200 lg:block ${
           isSidebarCollapsed ? "w-[4.75rem]" : "w-64"
         }`}
       >
@@ -128,7 +128,7 @@ export function CrmShell({ children, profile, userEmail }: CrmShellProps) {
             </Link>
             <button
               aria-label={isSidebarCollapsed ? "Mostrar menu" : "Ocultar menu"}
-              className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg border border-[#dfd7cc] transition hover:bg-[#f5f3e7]"
+              className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg border border-[#ead8c8] bg-white/80 transition hover:bg-[#fff0ea]"
               onClick={() => setIsSidebarCollapsed((current) => !current)}
               type="button"
             >
@@ -178,7 +178,7 @@ export function CrmShell({ children, profile, userEmail }: CrmShellProps) {
             </div>
 
             <div
-              className={`mt-auto rounded-lg bg-[#f8f6ee] p-3 text-sm text-[#5d5248] ${
+              className={`mt-auto rounded-lg border border-[#f1c9bf] bg-[#fff0ea] p-3 text-sm text-[#6a5148] ${
                 isSidebarCollapsed ? "hidden" : ""
               }`}
             >
@@ -199,7 +199,7 @@ export function CrmShell({ children, profile, userEmail }: CrmShellProps) {
         <div className="min-w-0">{children}</div>
       </div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-[#dfd7cc] bg-white/95 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_24px_rgba(51,51,51,0.08)] backdrop-blur lg:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-[#ead8c8] bg-[rgba(255,253,248,0.95)] px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_24px_rgba(201,111,97,0.12)] backdrop-blur lg:hidden">
         <div className="mx-auto grid max-w-md grid-cols-5 gap-1">
           {mobileNavItems.map((item) => {
             const Icon = item.icon;
@@ -254,10 +254,10 @@ function navItemClassName(isActive: boolean, isCollapsed: boolean) {
   const size = isCollapsed ? "justify-center px-0" : "gap-3 px-3";
 
   if (isActive) {
-    return `${base} ${size} bg-[#333333] text-[#f5f3e7]`;
+    return `${base} ${size} bg-[#c96f61] text-white shadow-sm`;
   }
 
-  return `${base} ${size} text-[#333333] hover:bg-[#f5f3e7]`;
+  return `${base} ${size} text-[#3b302b] hover:bg-[#fff0ea]`;
 }
 
 function mobileNavItemClassName(isActive: boolean) {
@@ -265,8 +265,8 @@ function mobileNavItemClassName(isActive: boolean) {
     "flex min-w-0 flex-col items-center justify-center gap-1 rounded-lg px-1 py-2 text-[10px] font-semibold transition sm:text-[11px]";
 
   if (isActive) {
-    return `${base} bg-[#333333] text-[#f5f3e7]`;
+    return `${base} bg-[#c96f61] text-white shadow-sm`;
   }
 
-  return `${base} text-[#5d5248] hover:bg-[#f5f3e7]`;
+  return `${base} text-[#5d5248] hover:bg-[#fff0ea]`;
 }

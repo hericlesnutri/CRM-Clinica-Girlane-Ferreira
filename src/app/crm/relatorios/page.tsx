@@ -102,7 +102,7 @@ export default async function ReportsPage() {
           </div>
 
           <Link
-            className="inline-flex h-10 items-center justify-center rounded-lg bg-[#333333] px-4 text-sm font-semibold text-[#f5f3e7] transition hover:bg-[#4a4037]"
+            className="inline-flex h-10 items-center justify-center rounded-lg bg-[#c96f61] px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#b85f52]"
             href="/crm/oportunidades"
           >
             Abrir vendas
@@ -179,7 +179,7 @@ export default async function ReportsPage() {
 
 function MetricCard({ label, value }: { label: string; value: string }) {
   return (
-    <article className="rounded-lg border border-[#dfd7cc] bg-white p-5">
+    <article className="rounded-lg border border-[#ead8c8] bg-[#fffdf8] p-5 shadow-sm">
       <p className="text-sm text-[#5d5248]">{label}</p>
       <p className="mt-3 text-2xl font-semibold">{value}</p>
     </article>
@@ -194,8 +194,8 @@ function ReportPanel({
   title: string;
 }) {
   return (
-    <section className="rounded-lg border border-[#dfd7cc] bg-white">
-      <div className="border-b border-[#dfd7cc] px-5 py-4">
+    <section className="rounded-lg border border-[#ead8c8] bg-[#fffdf8] shadow-sm">
+      <div className="border-b border-[#ead8c8] bg-[#fff0ea]/60 px-5 py-4">
         <h2 className="font-semibold">{title}</h2>
       </div>
       <div className="grid gap-3 p-5">{children}</div>
@@ -205,7 +205,7 @@ function ReportPanel({
 
 function ReportLine({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-lg bg-[#f8f6ee] px-4 py-3 text-sm">
+    <div className="flex items-center justify-between gap-4 rounded-lg bg-[#f4f8ef] px-4 py-3 text-sm">
       <span className="text-[#5d5248]">{label}</span>
       <span className="font-semibold">{value}</span>
     </div>
