@@ -12,7 +12,7 @@ export async function completeAgendaItem(formData: FormData) {
     return;
   }
 
-  const { supabase } = await requireUser();
+  const { supabase, user } = await requireUser();
 
   if (type === "contact") {
     const { data: contact } = await supabase
@@ -42,11 +42,14 @@ export async function completeAgendaItem(formData: FormData) {
       .eq("id", id)
       .single<{ notes: string | null; patient_id: string; proposed_value: number | null }>();
 
-    const completedNotes = completionNote
-      ? [opportunity?.notes, `Conclusao do retorno: ${completionNote}`]
-          .filter(Boolean)
-          .join("\n\n")
-      : opportunity?.notes;
+    if (completionNote) {
+      await supabase.from("opportunity_evolutions").insert({
+        opportunity_id: id,
+        created_by: user.id,
+        kind: "conclusao",
+        note: completionNote,
+      });
+    }
 
     await supabase
       .from("opportunities")
@@ -56,7 +59,7 @@ export async function completeAgendaItem(formData: FormData) {
         status: "fechada",
         expected_return_at: null,
         lost_at: null,
-        notes: completedNotes,
+        notes: opportunity?.notes,
       })
       .eq("id", id);
 
@@ -161,13 +164,17 @@ export async function registerAgendaEvolution(formData: FormData) {
   if (type === "opportunity") {
     const { data: opportunity } = await supabase
       .from("opportunities")
-      .select("notes, patient_id, proposed_value")
+      .select("patient_id, proposed_value")
       .eq("id", id)
-      .single<{ notes: string | null; patient_id: string; proposed_value: number | null }>();
+      .single<{ patient_id: string; proposed_value: number | null }>();
 
-    const evolvedNotes = [opportunity?.notes, `Evolucao registrada: ${evolutionNote}`]
-      .filter(Boolean)
-      .join("\n\n");
+    await supabase.from("opportunity_evolutions").insert({
+      opportunity_id: id,
+      created_by: user.id,
+      kind: "evolucao",
+      note: evolutionNote,
+      next_return_at: nextReturnIso,
+    });
 
     await supabase
       .from("opportunities")
@@ -176,7 +183,6 @@ export async function registerAgendaEvolution(formData: FormData) {
         closed_value: nextReturnIso ? null : (opportunity?.proposed_value ?? null),
         expected_return_at: nextReturnIso,
         lost_at: null,
-        notes: evolvedNotes,
         status: nextReturnIso ? "aguardando_retorno" : "fechada",
       })
       .eq("id", id);

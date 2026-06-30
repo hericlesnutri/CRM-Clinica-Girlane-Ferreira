@@ -42,6 +42,27 @@ type Opportunity = {
   } | null;
 };
 
+type OpportunityEvolution = {
+  id: string;
+  opportunity_id: string;
+  kind: string;
+  note: string;
+  next_return_at: string | null;
+  created_at: string;
+  profiles: {
+    full_name: string;
+  } | null;
+};
+
+type DisplayEvolution = {
+  id: string;
+  label: string;
+  note: string;
+  created_at: string | null;
+  author: string | null;
+  next_return_at: string | null;
+};
+
 type PatientProcedure = {
   procedure_name: string;
   performed_at: string | null;
@@ -110,6 +131,17 @@ export default async function PatientDetailsPage({
     .eq("patient_id", patient.id)
     .order("created_at", { ascending: false })
     .returns<Opportunity[]>();
+
+  const opportunityIds = (opportunities ?? []).map((opportunity) => opportunity.id);
+  const { data: opportunityEvolutions } = opportunityIds.length
+    ? await supabase
+        .from("opportunity_evolutions")
+        .select("id, opportunity_id, kind, note, next_return_at, created_at, profiles(full_name)")
+        .in("opportunity_id", opportunityIds)
+        .order("created_at", { ascending: true })
+        .returns<OpportunityEvolution[]>()
+    : { data: [] as OpportunityEvolution[] };
+  const evolutionsByOpportunity = groupOpportunityEvolutions(opportunityEvolutions ?? []);
 
   return (
     <main className="min-h-screen bg-[var(--brand-offwhite)] text-[var(--brand-dark)]">
@@ -189,7 +221,11 @@ export default async function PatientDetailsPage({
           {opportunities?.length ? (
             <div className="grid gap-3 bg-[#f8f6ee] p-3">
               {opportunities.map((opportunity) => (
-                <OpportunityCard key={opportunity.id} opportunity={opportunity} />
+                <OpportunityCard
+                  evolutions={evolutionsByOpportunity.get(opportunity.id) ?? []}
+                  key={opportunity.id}
+                  opportunity={opportunity}
+                />
               ))}
             </div>
           ) : (
@@ -290,10 +326,25 @@ function InfoItem({ label, value }: { label: string; value: string }) {
   );
 }
 
-function OpportunityCard({ opportunity }: { opportunity: Opportunity }) {
-  const { label, mainText, highlightedText } = splitHighlightedNote(
-    opportunity.notes ?? "",
-  );
+function OpportunityCard({
+  evolutions,
+  opportunity,
+}: {
+  evolutions: OpportunityEvolution[];
+  opportunity: Opportunity;
+}) {
+  const { mainText, legacyEvolutions } = splitOpportunityNotes(opportunity.notes ?? "");
+  const displayedEvolutions = [
+    ...legacyEvolutions,
+    ...evolutions.map((evolution) => ({
+      author: evolution.profiles?.full_name ?? "Equipe",
+      created_at: evolution.created_at,
+      id: evolution.id,
+      label: evolution.kind === "conclusao" ? "Conclusao do retorno" : "Evolucao registrada",
+      next_return_at: evolution.next_return_at,
+      note: evolution.note,
+    })),
+  ];
 
   return (
     <article className="rounded-lg border border-amber-300 bg-amber-50 p-4">
@@ -342,18 +393,88 @@ function OpportunityCard({ opportunity }: { opportunity: Opportunity }) {
         </p>
       ) : null}
 
-      {highlightedText ? (
-        <div className="mt-4 rounded-lg border border-[#9e7f60]/30 bg-white/80 p-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#9e7f60]">
-            {label}
-          </p>
-          <p className="mt-2 whitespace-pre-line text-sm leading-6">
-            {highlightedText}
-          </p>
+      {displayedEvolutions.length ? (
+        <div className="mt-4 grid gap-3">
+          {displayedEvolutions.map((evolution) => (
+            <div
+              className="rounded-lg border border-[#9e7f60]/30 bg-white/85 p-3"
+              key={evolution.id}
+            >
+              <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#9e7f60]">
+                  {evolution.label}
+                </p>
+                {evolution.created_at ? (
+                  <p className="text-xs text-[#5d5248]">
+                    {new Date(evolution.created_at).toLocaleString("pt-BR")} por{" "}
+                    {evolution.author ?? "Equipe"}
+                  </p>
+                ) : null}
+              </div>
+              <p className="mt-2 whitespace-pre-line text-sm leading-6">
+                {evolution.note}
+              </p>
+              {evolution.next_return_at ? (
+                <p className="mt-2 text-xs font-medium text-[#5d5248]">
+                  Novo retorno: {new Date(evolution.next_return_at).toLocaleString("pt-BR")}
+                </p>
+              ) : null}
+            </div>
+          ))}
         </div>
       ) : null}
     </article>
   );
+}
+
+function splitOpportunityNotes(text: string): {
+  legacyEvolutions: DisplayEvolution[];
+  mainText: string;
+} {
+  const markerRegex = /(Evolucao registrada:|Conclusao do retorno:)/g;
+  const matches = Array.from(text.matchAll(markerRegex));
+
+  if (!matches.length) {
+    return {
+      legacyEvolutions: [],
+      mainText: text.trim(),
+    };
+  }
+
+  const legacyEvolutions = matches.map((match, index) => {
+    const nextMatch = matches[index + 1];
+    const noteStart = (match.index ?? 0) + match[0].length;
+    const noteEnd = nextMatch?.index ?? text.length;
+
+    return {
+      author: null,
+      created_at: null,
+      id: `legacy-${index}-${noteStart}`,
+      label:
+        match[0] === "Conclusao do retorno:"
+          ? "Conclusao do retorno"
+          : "Evolucao registrada",
+      next_return_at: null,
+      note: text.slice(noteStart, noteEnd).trim(),
+    };
+  });
+
+  return {
+    legacyEvolutions: legacyEvolutions.filter((evolution) => evolution.note),
+    mainText: text.slice(0, matches[0].index).trim(),
+  };
+}
+
+function groupOpportunityEvolutions(evolutions: OpportunityEvolution[]) {
+  const groups = new Map<string, OpportunityEvolution[]>();
+
+  for (const evolution of evolutions) {
+    const current = groups.get(evolution.opportunity_id) ?? [];
+    current.push(evolution);
+    groups.set(evolution.opportunity_id, current);
+  }
+
+  return groups;
 }
 
 function splitHighlightedNote(text: string) {
