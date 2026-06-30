@@ -14,12 +14,7 @@ type Patient = {
 
 export default async function PatientsPage() {
   const { supabase } = await requireUser();
-  const { data: patients } = await supabase
-    .from("patients")
-    .select("id, name, phone, lead_source, main_interest, notes, created_at")
-    .order("created_at", { ascending: false })
-    .range(0, 4999)
-    .returns<Patient[]>();
+  const patients = await getAllPatients(supabase);
 
   return (
     <main className="min-h-screen bg-[var(--brand-offwhite)] text-[var(--brand-dark)]">
@@ -44,8 +39,37 @@ export default async function PatientsPage() {
           </Link>
         </div>
 
-        <PatientsList patients={patients ?? []} />
+        <PatientsList patients={patients} />
       </section>
     </main>
   );
+}
+
+async function getAllPatients(supabase: Awaited<ReturnType<typeof requireUser>>["supabase"]) {
+  const pageSize = 1000;
+  const patients: Patient[] = [];
+
+  for (let page = 0; page < 20; page++) {
+    const from = page * pageSize;
+    const to = from + pageSize - 1;
+    const { data, error } = await supabase
+      .from("patients")
+      .select("id, name, phone, lead_source, main_interest, notes, created_at")
+      .order("created_at", { ascending: false })
+      .range(from, to)
+      .returns<Patient[]>();
+
+    if (error) {
+      break;
+    }
+
+    const pageItems = data ?? [];
+    patients.push(...pageItems);
+
+    if (pageItems.length < pageSize) {
+      break;
+    }
+  }
+
+  return patients;
 }
