@@ -179,6 +179,10 @@ function FunnelColumn({
 }
 
 function OpportunityCard({ opportunity }: { opportunity: Opportunity }) {
+  if (isFinalStatus(opportunity.status)) {
+    return <FinalOpportunityCard opportunity={opportunity} />;
+  }
+
   return (
     <article className={cardClassName(opportunity.status)}>
       <div className="flex flex-wrap items-start justify-between gap-2">
@@ -234,6 +238,22 @@ function OpportunityCard({ opportunity }: { opportunity: Opportunity }) {
   );
 }
 
+function FinalOpportunityCard({ opportunity }: { opportunity: Opportunity }) {
+  return (
+    <article className={finalCardClassName(opportunity.status)}>
+      <p className="font-semibold leading-5">
+        {opportunity.patients?.name ?? "Paciente removido"}
+      </p>
+      <p className="mt-1 text-xs leading-5 text-[#5d5248]">
+        {opportunity.patients?.phone ?? "Telefone nao disponivel"}
+      </p>
+      <p className="mt-2 text-sm font-semibold">
+        {formatCurrency(opportunity.proposed_value)}
+      </p>
+    </article>
+  );
+}
+
 function InfoLine({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-3">
@@ -273,6 +293,16 @@ function cardClassName(status: OpportunityStatus) {
   }
 
   return `${base} border-amber-300 bg-amber-50`;
+}
+
+function finalCardClassName(status: OpportunityStatus) {
+  const base = "rounded-lg border p-2.5 shadow-sm";
+
+  if (status === "fechada") {
+    return `${base} border-emerald-300 bg-emerald-50`;
+  }
+
+  return `${base} border-red-200 bg-red-50`;
 }
 
 function badgeClassName(status: OpportunityStatus) {
@@ -318,3 +348,7 @@ const statusLabels: Record<OpportunityStatus, string> = {
   fechada: "Fechada",
   perdida: "Perdida",
 };
+
+function isFinalStatus(status: OpportunityStatus) {
+  return status === "fechada" || status === "perdida";
+}

@@ -20,13 +20,18 @@ export async function updateOpportunityStatus(formData: FormData) {
   }
 
   const { supabase } = await requireUser();
-  const shouldClearReturn = status === "fechada" || status === "perdida";
-  const payload: { expected_return_at?: null; status: string } = { status };
   const { data: opportunity } = await supabase
     .from("opportunities")
-    .select("patient_id")
+    .select("patient_id, status")
     .eq("id", id)
-    .single<{ patient_id: string }>();
+    .single<{ patient_id: string; status: string }>();
+
+  if (opportunity?.status === "fechada" || opportunity?.status === "perdida") {
+    return;
+  }
+
+  const shouldClearReturn = status === "fechada" || status === "perdida";
+  const payload: { expected_return_at?: null; status: string } = { status };
 
   if (shouldClearReturn) {
     payload.expected_return_at = null;
