@@ -153,7 +153,7 @@ function FunnelColumn({
 }) {
   return (
     <section className={funnelColumnClassName(column.status)}>
-      <div className="border-b border-white/70 px-3 py-3">
+      <div className="shrink-0 border-b border-white/70 px-3 py-3">
         <div className="flex items-center justify-between gap-3">
           <h2 className="font-semibold">{column.title}</h2>
           <span className={countClassName(column.status)}>{items.length}</span>
@@ -165,7 +165,7 @@ function FunnelColumn({
       </div>
 
       {items.length ? (
-        <div className="flex flex-1 flex-col gap-2 bg-white/45 p-2">
+        <div className="crm-hidden-scrollbar flex flex-1 flex-col gap-2 overflow-y-auto bg-white/45 p-2">
           {items.map((opportunity) => (
             <OpportunityCard key={opportunity.id} opportunity={opportunity} />
           ))}
@@ -309,7 +309,8 @@ function cardClassName(status: OpportunityStatus) {
 }
 
 function funnelColumnClassName(status: OpportunityStatus) {
-  const base = "flex min-h-[30rem] flex-col rounded-lg border shadow-sm";
+  const base =
+    "flex h-[min(42rem,calc(100vh-16rem))] min-h-[28rem] flex-col overflow-hidden rounded-lg border shadow-sm";
   const tones: Record<OpportunityStatus, string> = {
     aberta: "border-[#ead8a2] bg-[#fff7d9]",
     proposta_enviada: "border-[#f1c9bf] bg-[#fff0ea]",

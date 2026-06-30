@@ -31,6 +31,14 @@ body {
   color: var(--foreground);
 }
 
+.crm-hidden-scrollbar {
+  scrollbar-width: none;
+}
+
+.crm-hidden-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 @media (max-width: 768px) {
   input,
   select,
