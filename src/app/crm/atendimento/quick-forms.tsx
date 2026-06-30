@@ -203,7 +203,7 @@ function PostProcedureFields() {
 
         <label className="flex flex-col gap-2 text-sm font-medium">
           Primeiro acompanhamento
-          <input className={fieldClassName} name="next_contact_at" required type="datetime-local" />
+          <input className={fieldClassName} name="next_contact_at" required type="date" />
         </label>
 
         <label className="flex flex-col gap-2 text-sm font-medium">

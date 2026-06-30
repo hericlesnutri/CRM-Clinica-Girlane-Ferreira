@@ -193,7 +193,7 @@ export async function createPostProcedureFollowUp(
     .filter(Boolean)
     .join(" ");
 
-  const firstContactDate = new Date(nextContactAt);
+  const firstContactDate = dateOnlyToNoon(nextContactAt);
   const followUpGroupId = crypto.randomUUID();
   const followUps = Array.from({ length: followUpDays }, (_, index) => {
     const scheduledAt = new Date(firstContactDate);
@@ -235,6 +235,10 @@ export async function createPostProcedureFollowUp(
   revalidatePath("/crm/atendimento");
   revalidatePath(`/crm/pacientes/${patientId}`);
   redirect(`/crm/atendimento?salvo=pos_procedimento&paciente=${patientId}`);
+}
+
+function dateOnlyToNoon(value: string) {
+  return new Date(`${value}T12:00:00`);
 }
 
 export async function createCommercialRecord(

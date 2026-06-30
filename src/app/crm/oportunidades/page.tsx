@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { EvolutionDialog } from "../agenda/evolution-dialog";
-import { updateOpportunityStatus } from "./actions";
+import { OpportunityStatusSelect } from "./status-select";
 import { requireUser } from "@/lib/auth/require-user";
 
 type Opportunity = {
@@ -218,51 +218,19 @@ function OpportunityCard({ opportunity }: { opportunity: Opportunity }) {
         </p>
       ) : null}
 
-      <div className="mt-3 flex flex-wrap gap-1.5">
+      <div className="mt-3 grid gap-2">
+        <OpportunityStatusSelect id={opportunity.id} status={opportunity.status} />
+
         {opportunity.patients ? (
           <Link
-            className="inline-flex h-7 items-center rounded-md border border-[#dfd7cc] px-2 text-xs font-medium transition hover:bg-[#f5f3e7]"
+            className="inline-flex h-8 w-fit items-center rounded-md border border-[#dfd7cc] bg-white px-2 text-xs font-medium transition hover:bg-[#f5f3e7]"
             href={`/crm/pacientes/${opportunity.patients.id}`}
           >
             Abrir ficha
           </Link>
         ) : null}
-
-        {statusActions
-          .filter((action) => action.status !== opportunity.status)
-          .map((action) => (
-            <StatusButton
-              id={opportunity.id}
-              key={action.status}
-              status={action.status}
-              title={action.title}
-            />
-          ))}
       </div>
     </article>
-  );
-}
-
-function StatusButton({
-  id,
-  status,
-  title,
-}: {
-  id: string;
-  status: OpportunityStatus;
-  title: string;
-}) {
-  return (
-    <form action={updateOpportunityStatus}>
-      <input name="id" type="hidden" value={id} />
-      <input name="status" type="hidden" value={status} />
-      <button
-        className="inline-flex h-7 items-center rounded-md border border-[#dfd7cc] px-2 text-xs font-medium transition hover:bg-[#f5f3e7]"
-        type="submit"
-      >
-        {title}
-      </button>
-    </form>
   );
 }
 
@@ -350,11 +318,3 @@ const statusLabels: Record<OpportunityStatus, string> = {
   fechada: "Fechada",
   perdida: "Perdida",
 };
-
-const statusActions: Array<{ status: OpportunityStatus; title: string }> = [
-  { status: "aberta", title: "Abrir" },
-  { status: "proposta_enviada", title: "Proposta" },
-  { status: "aguardando_retorno", title: "Aguardar" },
-  { status: "fechada", title: "Fechar" },
-  { status: "perdida", title: "Perder" },
-];
