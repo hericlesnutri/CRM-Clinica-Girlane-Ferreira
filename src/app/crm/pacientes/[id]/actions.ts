@@ -17,6 +17,11 @@ export type PatientEditFormState = {
 };
 
 const brazilianPhonePattern = /^\+55 \(\d{2}\) 9 \d{4}-\d{4}$/;
+const initialOpportunityStatuses = [
+  "aberta",
+  "proposta_enviada",
+  "aguardando_retorno",
+];
 
 export async function updatePatient(
   patientId: string,
@@ -121,7 +126,10 @@ export async function createOpportunity(
 ): Promise<OpportunityFormState> {
   const suggestedProcedure = String(formData.get("suggested_procedure") ?? "").trim();
   const proposedValue = String(formData.get("proposed_value") ?? "").trim();
-  const status = String(formData.get("status") ?? "aberta").trim();
+  const requestedStatus = String(formData.get("status") ?? "aberta").trim();
+  const status = initialOpportunityStatuses.includes(requestedStatus)
+    ? requestedStatus
+    : "aberta";
   const expectedReturnAt = String(formData.get("expected_return_at") ?? "").trim();
   const notes = String(formData.get("notes") ?? "").trim();
 

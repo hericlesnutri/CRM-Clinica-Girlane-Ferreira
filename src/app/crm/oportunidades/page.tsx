@@ -7,6 +7,7 @@ type Opportunity = {
   id: string;
   suggested_procedure: string;
   proposed_value: number | null;
+  closed_value: number | null;
   status: OpportunityStatus;
   expected_return_at: string | null;
   notes: string | null;
@@ -65,7 +66,7 @@ export default async function OpportunitiesPage() {
   const { data: opportunities } = await supabase
     .from("opportunities")
     .select(
-      "id, suggested_procedure, proposed_value, status, expected_return_at, notes, created_at, patients(id, name, phone)",
+      "id, suggested_procedure, proposed_value, closed_value, status, expected_return_at, notes, created_at, patients(id, name, phone)",
     )
     .order("created_at", { ascending: false })
     .returns<Opportunity[]>();
@@ -76,7 +77,7 @@ export default async function OpportunitiesPage() {
     .reduce((total, opportunity) => total + Number(opportunity.proposed_value ?? 0), 0);
   const wonValue = items
     .filter((opportunity) => opportunity.status === "fechada")
-    .reduce((total, opportunity) => total + Number(opportunity.proposed_value ?? 0), 0);
+    .reduce((total, opportunity) => total + getOpportunityValue(opportunity), 0);
 
   return (
     <main className="min-h-screen bg-[var(--brand-offwhite)] text-[var(--brand-dark)]">
@@ -113,7 +114,7 @@ export default async function OpportunitiesPage() {
                 (opportunity) => opportunity.status === column.status,
               );
               const columnValue = columnItems.reduce((total, opportunity) => {
-                return total + Number(opportunity.proposed_value ?? 0);
+                return total + getOpportunityValue(opportunity);
               }, 0);
 
               return (
@@ -223,7 +224,11 @@ function OpportunityCard({ opportunity }: { opportunity: Opportunity }) {
       ) : null}
 
       <div className="mt-3 grid gap-2">
-        <OpportunityStatusSelect id={opportunity.id} status={opportunity.status} />
+        <OpportunityStatusSelect
+          id={opportunity.id}
+          proposedValue={opportunity.proposed_value}
+          status={opportunity.status}
+        />
 
         {opportunity.patients ? (
           <Link
@@ -248,7 +253,7 @@ function FinalOpportunityCard({ opportunity }: { opportunity: Opportunity }) {
         {opportunity.patients?.phone ?? "Telefone nao disponivel"}
       </p>
       <p className="mt-2 text-sm font-semibold">
-        {formatCurrency(opportunity.proposed_value)}
+        {formatCurrency(getOpportunityValue(opportunity))}
       </p>
     </article>
   );
@@ -268,6 +273,14 @@ function formatCurrency(value: number | null) {
     style: "currency",
     currency: "BRL",
   });
+}
+
+function getOpportunityValue(opportunity: Opportunity) {
+  if (opportunity.status === "fechada") {
+    return Number(opportunity.closed_value ?? opportunity.proposed_value ?? 0);
+  }
+
+  return Number(opportunity.proposed_value ?? 0);
 }
 
 function formatDateTime(value: string) {

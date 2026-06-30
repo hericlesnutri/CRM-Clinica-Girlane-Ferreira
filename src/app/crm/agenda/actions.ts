@@ -38,9 +38,9 @@ export async function completeAgendaItem(formData: FormData) {
   if (type === "opportunity") {
     const { data: opportunity } = await supabase
       .from("opportunities")
-      .select("notes, patient_id")
+      .select("notes, patient_id, proposed_value")
       .eq("id", id)
-      .single<{ notes: string | null; patient_id: string }>();
+      .single<{ notes: string | null; patient_id: string; proposed_value: number | null }>();
 
     const completedNotes = completionNote
       ? [opportunity?.notes, `Conclusao do retorno: ${completionNote}`]
@@ -51,6 +51,7 @@ export async function completeAgendaItem(formData: FormData) {
     await supabase
       .from("opportunities")
       .update({
+        closed_value: opportunity?.proposed_value ?? null,
         status: "fechada",
         expected_return_at: null,
         notes: completedNotes,
@@ -158,9 +159,9 @@ export async function registerAgendaEvolution(formData: FormData) {
   if (type === "opportunity") {
     const { data: opportunity } = await supabase
       .from("opportunities")
-      .select("notes, patient_id")
+      .select("notes, patient_id, proposed_value")
       .eq("id", id)
-      .single<{ notes: string | null; patient_id: string }>();
+      .single<{ notes: string | null; patient_id: string; proposed_value: number | null }>();
 
     const evolvedNotes = [opportunity?.notes, `Evolucao registrada: ${evolutionNote}`]
       .filter(Boolean)
@@ -169,6 +170,7 @@ export async function registerAgendaEvolution(formData: FormData) {
     await supabase
       .from("opportunities")
       .update({
+        closed_value: nextReturnIso ? null : (opportunity?.proposed_value ?? null),
         expected_return_at: nextReturnIso,
         notes: evolvedNotes,
         status: nextReturnIso ? "aguardando_retorno" : "fechada",

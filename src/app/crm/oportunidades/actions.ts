@@ -14,8 +14,16 @@ const validStatuses = [
 export async function updateOpportunityStatus(formData: FormData) {
   const id = String(formData.get("id") ?? "").trim();
   const status = String(formData.get("status") ?? "").trim();
+  const closedValue = String(formData.get("closed_value") ?? "").trim();
 
   if (!id || !validStatuses.includes(status)) {
+    return;
+  }
+
+  const numericClosedValue =
+    status === "fechada" ? parseCurrencyValue(closedValue) : null;
+
+  if (status === "fechada" && numericClosedValue === null) {
     return;
   }
 
@@ -31,10 +39,22 @@ export async function updateOpportunityStatus(formData: FormData) {
   }
 
   const shouldClearReturn = status === "fechada" || status === "perdida";
-  const payload: { expected_return_at?: null; status: string } = { status };
+  const payload: {
+    closed_value?: number | null;
+    expected_return_at?: null;
+    status: string;
+  } = { status };
 
   if (shouldClearReturn) {
     payload.expected_return_at = null;
+  }
+
+  if (status === "fechada") {
+    payload.closed_value = numericClosedValue;
+  }
+
+  if (status === "perdida") {
+    payload.closed_value = null;
   }
 
   await supabase
@@ -49,4 +69,18 @@ export async function updateOpportunityStatus(formData: FormData) {
   if (opportunity?.patient_id) {
     revalidatePath(`/crm/pacientes/${opportunity.patient_id}`);
   }
+}
+
+function parseCurrencyValue(value: string) {
+  if (!value) {
+    return null;
+  }
+
+  const numericValue = Number(value.replace(/\./g, "").replace(",", "."));
+
+  if (Number.isNaN(numericValue)) {
+    return null;
+  }
+
+  return numericValue;
 }

@@ -32,6 +32,7 @@ type Opportunity = {
   id: string;
   suggested_procedure: string;
   proposed_value: number | null;
+  closed_value: number | null;
   status: string;
   expected_return_at: string | null;
   notes: string | null;
@@ -104,7 +105,7 @@ export default async function PatientDetailsPage({
   const { data: opportunities } = await supabase
     .from("opportunities")
     .select(
-      "id, suggested_procedure, proposed_value, status, expected_return_at, notes, created_at, profiles(full_name)",
+      "id, suggested_procedure, proposed_value, closed_value, status, expected_return_at, notes, created_at, profiles(full_name)",
     )
     .eq("patient_id", patient.id)
     .order("created_at", { ascending: false })
@@ -313,9 +314,9 @@ function OpportunityCard({ opportunity }: { opportunity: Opportunity }) {
         <InfoItem
           label="Valor"
           value={
-            opportunity.proposed_value === null
+            getPatientOpportunityValue(opportunity) === null
               ? "Nao informado"
-              : Number(opportunity.proposed_value).toLocaleString("pt-BR", {
+              : Number(getPatientOpportunityValue(opportunity)).toLocaleString("pt-BR", {
                   style: "currency",
                   currency: "BRL",
                 })
@@ -398,4 +399,12 @@ function contactBadgeClassName(contact: ContactLog) {
   }
 
   return `${base} bg-amber-200 text-amber-900`;
+}
+
+function getPatientOpportunityValue(opportunity: Opportunity) {
+  if (opportunity.status === "fechada") {
+    return opportunity.closed_value ?? opportunity.proposed_value;
+  }
+
+  return opportunity.proposed_value;
 }

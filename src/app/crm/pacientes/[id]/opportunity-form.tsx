@@ -47,8 +47,6 @@ export function OpportunityForm({ patientId }: { patientId: string }) {
             <option value="aberta">Aberta</option>
             <option value="proposta_enviada">Proposta enviada</option>
             <option value="aguardando_retorno">Aguardando retorno</option>
-            <option value="fechada">Fechada</option>
-            <option value="perdida">Perdida</option>
           </select>
         </label>
 

@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { requireUser } from "@/lib/auth/require-user";
 
 type Opportunity = {
+  closed_value: number | null;
   proposed_value: number | null;
   status: OpportunityStatus;
   created_at: string;
@@ -44,7 +45,7 @@ export default async function ReportsPage() {
   ] = await Promise.all([
     supabase
       .from("opportunities")
-      .select("proposed_value, status, created_at")
+      .select("closed_value, proposed_value, status, created_at")
       .returns<Opportunity[]>(),
     supabase
       .from("contact_logs")
@@ -214,6 +215,10 @@ function ReportLine({ label, value }: { label: string; value: string }) {
 
 function sumOpportunityValue(opportunities: Opportunity[]) {
   return opportunities.reduce((total, opportunity) => {
+    if (opportunity.status === "fechada") {
+      return total + Number(opportunity.closed_value ?? opportunity.proposed_value ?? 0);
+    }
+
     return total + Number(opportunity.proposed_value ?? 0);
   }, 0);
 }
