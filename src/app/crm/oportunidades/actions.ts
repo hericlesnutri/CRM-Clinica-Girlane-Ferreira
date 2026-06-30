@@ -40,8 +40,10 @@ export async function updateOpportunityStatus(formData: FormData) {
 
   const shouldClearReturn = status === "fechada" || status === "perdida";
   const payload: {
+    closed_at?: string | null;
     closed_value?: number | null;
     expected_return_at?: null;
+    lost_at?: string | null;
     status: string;
   } = { status };
 
@@ -50,11 +52,20 @@ export async function updateOpportunityStatus(formData: FormData) {
   }
 
   if (status === "fechada") {
+    payload.closed_at = new Date().toISOString();
     payload.closed_value = numericClosedValue;
+    payload.lost_at = null;
   }
 
   if (status === "perdida") {
+    payload.closed_at = null;
     payload.closed_value = null;
+    payload.lost_at = new Date().toISOString();
+  }
+
+  if (status !== "fechada" && status !== "perdida") {
+    payload.closed_at = null;
+    payload.lost_at = null;
   }
 
   await supabase
@@ -65,6 +76,7 @@ export async function updateOpportunityStatus(formData: FormData) {
   revalidatePath("/crm");
   revalidatePath("/crm/agenda");
   revalidatePath("/crm/oportunidades");
+  revalidatePath("/crm/relatorios");
 
   if (opportunity?.patient_id) {
     revalidatePath(`/crm/pacientes/${opportunity.patient_id}`);

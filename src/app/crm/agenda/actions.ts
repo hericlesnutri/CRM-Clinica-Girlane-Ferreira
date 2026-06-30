@@ -51,9 +51,11 @@ export async function completeAgendaItem(formData: FormData) {
     await supabase
       .from("opportunities")
       .update({
+        closed_at: new Date().toISOString(),
         closed_value: opportunity?.proposed_value ?? null,
         status: "fechada",
         expected_return_at: null,
+        lost_at: null,
         notes: completedNotes,
       })
       .eq("id", id);
@@ -170,8 +172,10 @@ export async function registerAgendaEvolution(formData: FormData) {
     await supabase
       .from("opportunities")
       .update({
+        closed_at: nextReturnIso ? null : new Date().toISOString(),
         closed_value: nextReturnIso ? null : (opportunity?.proposed_value ?? null),
         expected_return_at: nextReturnIso,
+        lost_at: null,
         notes: evolvedNotes,
         status: nextReturnIso ? "aguardando_retorno" : "fechada",
       })
@@ -185,4 +189,5 @@ export async function registerAgendaEvolution(formData: FormData) {
   revalidatePath("/crm");
   revalidatePath("/crm/agenda");
   revalidatePath("/crm/oportunidades");
+  revalidatePath("/crm/relatorios");
 }
