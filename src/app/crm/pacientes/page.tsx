@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { PatientForm } from "./patient-form";
 import { PatientsList } from "./patients-list";
 import { requireUser } from "@/lib/auth/require-user";
 
@@ -23,7 +22,7 @@ export default async function PatientsPage() {
 
   return (
     <main className="min-h-screen bg-[var(--brand-offwhite)] text-[var(--brand-dark)]">
-      <section className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-6 py-8">
+      <section className="flex w-full flex-col gap-5 py-5 lg:py-0">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <Link className="text-sm font-medium text-[#9e7f60]" href="/crm">
@@ -31,13 +30,18 @@ export default async function PatientsPage() {
             </Link>
             <h1 className="mt-2 text-3xl font-semibold">Pacientes</h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-[#5d5248]">
-              Cadastre pacientes e mantenha os primeiros dados comerciais
-              organizados para novos contatos.
+              Busque uma ficha, veja historico e continue o atendimento com
+              mais contexto.
             </p>
           </div>
-        </div>
 
-        <PatientForm />
+          <Link
+            className="inline-flex h-10 items-center justify-center rounded-lg bg-[#333333] px-4 text-sm font-semibold text-[#f5f3e7] transition hover:bg-[#4a4037]"
+            href="/crm/atendimento"
+          >
+            Novo paciente
+          </Link>
+        </div>
 
         <PatientsList patients={patients ?? []} />
       </section>

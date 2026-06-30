@@ -80,16 +80,15 @@ export default async function OpportunitiesPage() {
 
   return (
     <main className="min-h-screen bg-[var(--brand-offwhite)] text-[var(--brand-dark)]">
-      <section className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-6 py-8">
+      <section className="flex w-full flex-col gap-5 py-5 lg:py-0">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
             <Link className="text-sm font-medium text-[#9e7f60]" href="/crm">
               Voltar ao painel
             </Link>
-            <h1 className="mt-2 text-3xl font-semibold">Funil de oportunidades</h1>
+            <h1 className="mt-2 text-3xl font-semibold">Oportunidades</h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-[#5d5248]">
-              Acompanhe propostas em aberto, retornos comerciais e oportunidades
-              fechadas em um formato de CRM/Kanban.
+              Veja propostas, retornos e vendas em colunas simples.
             </p>
           </div>
 
@@ -107,8 +106,8 @@ export default async function OpportunitiesPage() {
           <SummaryCard label="Valor fechado" value={formatCurrency(wonValue)} />
         </div>
 
-        <div className="-mx-6 overflow-x-auto px-6 pt-3 [transform:rotateX(180deg)]">
-          <div className="grid min-w-[110rem] grid-cols-5 gap-4 [transform:rotateX(180deg)]">
+        <div className="-mx-4 overflow-x-auto px-4 pt-2 [transform:rotateX(180deg)]">
+          <div className="grid min-w-[92rem] grid-cols-5 gap-3 [transform:rotateX(180deg)]">
             {funnelColumns.map((column) => {
               const columnItems = items.filter(
                 (opportunity) => opportunity.status === column.status,
@@ -152,14 +151,14 @@ function FunnelColumn({
   totalValue: number;
 }) {
   return (
-    <section className="flex min-h-[32rem] flex-col rounded-lg border border-[#dfd7cc] bg-white">
-      <div className="border-b border-[#dfd7cc] px-4 py-4">
+    <section className="flex min-h-[30rem] flex-col rounded-lg border border-[#dfd7cc] bg-white">
+      <div className="border-b border-[#dfd7cc] px-3 py-3">
         <div className="flex items-center justify-between gap-3">
           <h2 className="font-semibold">{column.title}</h2>
           <span className={countClassName(column.status)}>{items.length}</span>
         </div>
-        <p className="mt-2 text-xs leading-5 text-[#5d5248]">{column.description}</p>
-        <p className="mt-3 text-sm font-semibold text-[#9e7f60]">
+        <p className="mt-1 text-xs leading-5 text-[#5d5248]">{column.description}</p>
+        <p className="mt-2 text-sm font-semibold text-[#9e7f60]">
           {formatCurrency(totalValue)}
         </p>
       </div>
@@ -291,7 +290,7 @@ function formatDateTime(value: string) {
 }
 
 function cardClassName(status: OpportunityStatus) {
-  const base = "rounded-lg border p-3 shadow-sm";
+  const base = "rounded-lg border p-2.5 shadow-sm";
 
   if (status === "fechada") {
     return `${base} border-emerald-300 bg-emerald-50`;

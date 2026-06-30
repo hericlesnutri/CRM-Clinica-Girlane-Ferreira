@@ -29,16 +29,16 @@ export default async function CommercialDeskPage({
 
   return (
     <main className="min-h-screen bg-[var(--brand-offwhite)] text-[var(--brand-dark)]">
-      <section className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-6 py-8">
+      <section className="flex w-full flex-col gap-5 py-5 lg:py-0">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
             <Link className="text-sm font-medium text-[#9e7f60]" href="/crm">
               Voltar ao painel
             </Link>
-            <h1 className="mt-2 text-3xl font-semibold">Central comercial</h1>
+            <h1 className="mt-2 text-3xl font-semibold">Atender</h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-[#5d5248]">
-              Registre contatos e oportunidades em uma unica tela, sem precisar
-              abrir a ficha completa do paciente a cada atendimento.
+              Cadastre paciente, conversa, oportunidade ou pos-procedimento em
+              uma unica tela.
             </p>
           </div>
 
@@ -46,7 +46,7 @@ export default async function CommercialDeskPage({
             className="inline-flex h-10 items-center justify-center rounded-lg border border-[#dfd7cc] bg-white px-4 text-sm font-medium transition hover:bg-[#f5f3e7]"
             href="/crm/pacientes"
           >
-            Ver lista de pacientes
+            Buscar paciente
           </Link>
         </div>
 

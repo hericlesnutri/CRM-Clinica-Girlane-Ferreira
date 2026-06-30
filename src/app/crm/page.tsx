@@ -50,56 +50,49 @@ export default async function CrmPage() {
 
   return (
     <main>
-      <section className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-6 py-8">
-        <div className="rounded-lg border border-[#dfd7cc] bg-white p-6">
+      <section className="flex w-full flex-col gap-5 py-5 lg:py-0">
+        <div className="rounded-lg border border-[#dfd7cc] bg-white p-5 lg:p-6">
           <p className="text-sm font-medium uppercase tracking-[0.16em] text-[#9e7f60]">
-            Proxima etapa
+            Comece aqui
           </p>
           <h2 className="mt-2 text-2xl font-semibold">
-            Operacao comercial do dia.
+            O que precisa ser feito hoje?
           </h2>
           <p className="mt-3 max-w-3xl leading-7 text-[#5d5248]">
-            Use a central comercial para registrar contatos e oportunidades em
-            uma unica tela. A ficha completa do paciente continua disponivel
-            para consulta detalhada.
+            Use este painel como ponto de partida. Para registrar qualquer
+            conversa, proposta ou pos-procedimento, comece por Atender.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link
               className="inline-flex h-10 items-center rounded-lg bg-[#333333] px-4 text-sm font-semibold text-[#f5f3e7] transition hover:bg-[#4a4037]"
               href="/crm/atendimento"
             >
-              Abrir central comercial
+              Novo atendimento
             </Link>
             <Link
               className="inline-flex h-10 items-center rounded-lg border border-[#dfd7cc] px-4 text-sm font-semibold transition hover:bg-[#f5f3e7]"
               href="/crm/agenda"
             >
-              Ver agenda de retornos
+              Ver retornos
             </Link>
             <Link
               className="inline-flex h-10 items-center rounded-lg border border-[#dfd7cc] px-4 text-sm font-semibold transition hover:bg-[#f5f3e7]"
               href="/crm/oportunidades"
             >
-              Ver funil de oportunidades
+              Ver oportunidades
             </Link>
             <Link
               className="inline-flex h-10 items-center rounded-lg border border-[#dfd7cc] px-4 text-sm font-semibold transition hover:bg-[#f5f3e7]"
               href="/crm/pacientes"
             >
-              Cadastrar pacientes
-            </Link>
-            <Link
-              className="inline-flex h-10 items-center rounded-lg border border-[#dfd7cc] px-4 text-sm font-semibold transition hover:bg-[#f5f3e7]"
-              href="/crm/relatorios"
-            >
-              Ver relatorios
+              Buscar paciente
             </Link>
             {profile?.role === "admin" ? (
               <Link
                 className="inline-flex h-10 items-center rounded-lg border border-[#dfd7cc] px-4 text-sm font-semibold transition hover:bg-[#f5f3e7]"
                 href="/crm/admin"
               >
-                Administrar equipe
+                Equipe
               </Link>
             ) : null}
           </div>

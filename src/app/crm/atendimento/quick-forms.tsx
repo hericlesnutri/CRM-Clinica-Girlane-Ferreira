@@ -31,11 +31,16 @@ export function QuickForms({ patients }: { patients: PatientOption[] }) {
 
   return (
     <div className="grid gap-5">
-      <form action={patientAction} className="grid gap-4 rounded-lg border border-[#dfd7cc] bg-white p-5">
-        <div>
-          <h2 className="text-xl font-semibold">Cadastrar paciente rapido</h2>
+      <form action={patientAction} className="grid gap-4 rounded-lg border border-[#dfd7cc] bg-white p-4 lg:p-5">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#9e7f60]">
+              Primeiro contato
+            </p>
+            <h2 className="mt-1 text-xl font-semibold">Cadastrar paciente</h2>
+          </div>
           <p className="mt-1 text-sm text-[#5d5248]">
-            Use quando o paciente ainda nao existir no CRM.
+            Use apenas se ele ainda nao aparece na busca abaixo.
           </p>
         </div>
 
@@ -81,10 +86,15 @@ export function QuickForms({ patients }: { patients: PatientOption[] }) {
 
       {patients.length ? (
         <form action={commercialAction} className={commercialFormClassName(recordType)}>
-          <div>
-            <h2 className="text-xl font-semibold">Registro comercial</h2>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#9e7f60]">
+                Atendimento
+              </p>
+              <h2 className="mt-1 text-xl font-semibold">Registrar no CRM</h2>
+            </div>
             <p className="mt-1 text-sm text-[#5d5248]">
-              Escolha o tipo de registro e preencha apenas os campos necessarios.
+              Escolha uma opcao. O formulario muda sozinho.
             </p>
           </div>
 
@@ -375,7 +385,7 @@ function TypeButton({
 }) {
   return (
     <button
-      className={`rounded-lg border p-4 text-left transition ${
+      className={`rounded-lg border p-3 text-left transition ${
         active
           ? "border-[#333333] bg-[#333333] text-[#f5f3e7]"
           : "border-[#dfd7cc] bg-white hover:bg-[#f5f3e7]"
@@ -384,7 +394,7 @@ function TypeButton({
       type="button"
     >
       <span className="font-semibold">{label}</span>
-      <span className={`mt-1 block text-sm ${active ? "text-[#dfd7cc]" : "text-[#5d5248]"}`}>
+      <span className={`mt-1 block text-xs leading-5 ${active ? "text-[#dfd7cc]" : "text-[#5d5248]"}`}>
         {description}
       </span>
     </button>
@@ -412,7 +422,7 @@ const submitLabelByType: Record<RecordType, string> = {
 };
 
 function commercialFormClassName(recordType: RecordType) {
-  const base = "grid gap-4 rounded-lg border p-5";
+  const base = "grid gap-4 rounded-lg border p-4 lg:p-5";
 
   if (recordType === "oportunidade") {
     return `${base} border-amber-300 bg-amber-50`;
