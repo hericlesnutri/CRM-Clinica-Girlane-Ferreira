@@ -17,14 +17,19 @@ export function PatientsList({ patients }: { patients: Patient[] }) {
   const [search, setSearch] = useState("");
   const filteredPatients = useMemo(() => {
     const normalizedSearch = normalizeSearch(search);
+    const searchDigits = onlyDigits(search);
 
     if (!normalizedSearch) {
       return patients;
     }
 
     return patients.filter((patient) => {
-      return normalizeSearch(`${patient.name} ${patient.phone}`).includes(
-        normalizedSearch,
+      const patientDigits = onlyDigits(patient.phone);
+      const patientSearchText = normalizeSearch(`${patient.name} ${patient.phone}`);
+
+      return (
+        patientSearchText.includes(normalizedSearch) ||
+        Boolean(searchDigits && patientDigits.includes(searchDigits))
       );
     });
   }, [patients, search]);
@@ -99,4 +104,8 @@ function normalizeSearch(value: string) {
     .toLowerCase()
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function onlyDigits(value: string) {
+  return value.replace(/\D/g, "");
 }

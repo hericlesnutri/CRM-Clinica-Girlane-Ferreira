@@ -18,6 +18,7 @@ export default async function PatientsPage() {
     .from("patients")
     .select("id, name, phone, lead_source, main_interest, notes, created_at")
     .order("created_at", { ascending: false })
+    .range(0, 4999)
     .returns<Patient[]>();
 
   return (
