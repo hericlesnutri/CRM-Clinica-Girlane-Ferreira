@@ -3,6 +3,8 @@
 import {
   BarChart3,
   CalendarDays,
+  ChevronLeft,
+  ChevronRight,
   LayoutDashboard,
   LogOut,
   Settings,
@@ -13,6 +15,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { useState } from "react";
 import { signOut } from "@/app/auth/actions";
 
 type AppRole = "admin" | "recepcionista" | "comercial";
@@ -47,6 +50,7 @@ const secondaryNavItems = [
 
 export function CrmShell({ children, profile, userEmail }: CrmShellProps) {
   const pathname = usePathname();
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const visiblePrimaryNavItems = primaryNavItems;
   const visibleSecondaryNavItems = secondaryNavItems.filter((item) => {
     return !item.adminOnly || profile?.role === "admin";
@@ -55,8 +59,12 @@ export function CrmShell({ children, profile, userEmail }: CrmShellProps) {
 
   return (
     <div className="min-h-screen bg-[var(--brand-offwhite)] pb-20 text-[var(--brand-dark)] lg:pb-0">
-      <header className="sticky top-0 z-40 border-b border-[#dfd7cc] bg-white/95 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+      <header className="sticky top-0 z-40 border-b border-[#dfd7cc] bg-white/95 backdrop-blur lg:fixed lg:inset-x-0">
+        <div
+          className={`mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-3 transition-[padding] sm:px-6 ${
+            isSidebarCollapsed ? "lg:pl-24" : "lg:pl-72"
+          }`}
+        >
           <div className="flex items-center justify-between gap-4">
             <Link href="/crm" className="min-w-0">
               <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#9e7f60]">
@@ -95,36 +103,99 @@ export function CrmShell({ children, profile, userEmail }: CrmShellProps) {
         </div>
       </header>
 
-      <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 sm:px-6 lg:grid-cols-[15rem_1fr] lg:py-6">
-        <aside className="sticky top-[4.25rem] hidden h-[calc(100vh-5.75rem)] rounded-lg border border-[#dfd7cc] bg-white p-3 lg:block">
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 hidden border-r border-[#dfd7cc] bg-white p-3 transition-[width] duration-200 lg:block ${
+          isSidebarCollapsed ? "w-[4.75rem]" : "w-64"
+        }`}
+      >
+        <div className="flex h-full flex-col">
+          <div className="mb-4 flex items-center justify-between gap-3 px-2">
+            <Link className="min-w-0" href="/crm">
+              <p
+                className={`text-xs font-medium uppercase tracking-[0.18em] text-[#9e7f60] ${
+                  isSidebarCollapsed ? "sr-only" : ""
+                }`}
+              >
+                CRM Girlane Ferreira
+              </p>
+              <p
+                className={`truncate text-lg font-semibold ${
+                  isSidebarCollapsed ? "sr-only" : ""
+                }`}
+              >
+                Central da clinica
+              </p>
+            </Link>
+            <button
+              aria-label={isSidebarCollapsed ? "Mostrar menu" : "Ocultar menu"}
+              className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg border border-[#dfd7cc] transition hover:bg-[#f5f3e7]"
+              onClick={() => setIsSidebarCollapsed((current) => !current)}
+              type="button"
+            >
+              {isSidebarCollapsed ? (
+                <ChevronRight aria-hidden className="size-4" />
+              ) : (
+                <ChevronLeft aria-hidden className="size-4" />
+              )}
+            </button>
+          </div>
+
           <nav className="flex h-full flex-col">
             <div className="space-y-1">
-              <p className="px-3 pb-2 pt-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#9e7f60]">
+              <p
+                className={`px-3 pb-2 pt-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#9e7f60] ${
+                  isSidebarCollapsed ? "sr-only" : ""
+                }`}
+              >
                 Rotina
               </p>
               {visiblePrimaryNavItems.map((item) => (
-                <NavLink item={item} key={item.href} pathname={pathname} />
+                <NavLink
+                  isCollapsed={isSidebarCollapsed}
+                  item={item}
+                  key={item.href}
+                  pathname={pathname}
+                />
               ))}
             </div>
 
             <div className="mt-6 space-y-1">
-              <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#9e7f60]">
+              <p
+                className={`px-3 pb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#9e7f60] ${
+                  isSidebarCollapsed ? "sr-only" : ""
+                }`}
+              >
                 Gestao
               </p>
               {visibleSecondaryNavItems.map((item) => (
-                <NavLink item={item} key={item.href} pathname={pathname} />
+                <NavLink
+                  isCollapsed={isSidebarCollapsed}
+                  item={item}
+                  key={item.href}
+                  pathname={pathname}
+                />
               ))}
             </div>
 
-            <div className="mt-auto rounded-lg bg-[#f8f6ee] p-3 text-sm text-[#5d5248]">
+            <div
+              className={`mt-auto rounded-lg bg-[#f8f6ee] p-3 text-sm text-[#5d5248] ${
+                isSidebarCollapsed ? "hidden" : ""
+              }`}
+            >
               <p className="font-semibold text-[#333333]">Dica rapida</p>
               <p className="mt-1 leading-5">
                 Para qualquer conversa nova, comece por Atender.
               </p>
             </div>
           </nav>
-        </aside>
+        </div>
+      </aside>
 
+      <div
+        className={`mx-auto w-full max-w-7xl px-4 transition-[padding] sm:px-6 lg:py-24 ${
+          isSidebarCollapsed ? "lg:pl-24" : "lg:pl-72"
+        }`}
+      >
         <div className="min-w-0">{children}</div>
       </div>
 
@@ -153,9 +224,11 @@ export function CrmShell({ children, profile, userEmail }: CrmShellProps) {
 }
 
 function NavLink({
+  isCollapsed,
   item,
   pathname,
 }: {
+  isCollapsed: boolean;
   item: (typeof primaryNavItems)[number] | (typeof secondaryNavItems)[number];
   pathname: string;
 }) {
@@ -163,22 +236,28 @@ function NavLink({
   const isActive = item.href === "/crm" ? pathname === "/crm" : pathname.startsWith(item.href);
 
   return (
-    <Link className={navItemClassName(isActive)} href={item.href}>
+    <Link
+      aria-label={item.label}
+      className={navItemClassName(isActive, isCollapsed)}
+      href={item.href}
+      title={isCollapsed ? item.label : undefined}
+    >
       <Icon aria-hidden className="size-4" />
-      <span>{item.label}</span>
+      <span className={isCollapsed ? "sr-only" : ""}>{item.label}</span>
     </Link>
   );
 }
 
-function navItemClassName(isActive: boolean) {
+function navItemClassName(isActive: boolean, isCollapsed: boolean) {
   const base =
-    "flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-semibold transition";
+    "flex h-10 items-center rounded-lg text-sm font-semibold transition";
+  const size = isCollapsed ? "justify-center px-0" : "gap-3 px-3";
 
   if (isActive) {
-    return `${base} bg-[#333333] text-[#f5f3e7]`;
+    return `${base} ${size} bg-[#333333] text-[#f5f3e7]`;
   }
 
-  return `${base} text-[#333333] hover:bg-[#f5f3e7]`;
+  return `${base} ${size} text-[#333333] hover:bg-[#f5f3e7]`;
 }
 
 function mobileNavItemClassName(isActive: boolean) {
