@@ -35,7 +35,7 @@ type OpportunityReturn = {
 type AgendaItem = {
   id: string;
   type: "contact" | "opportunity";
-  cardKind: "general" | "waiting" | "postProcedure" | "opportunity";
+  cardKind: "sale" | "postSale";
   patientId: string | null;
   patientName: string;
   patientPhone: string;
@@ -92,7 +92,7 @@ export default async function AgendaPage() {
             </Link>
             <h1 className="mt-2 text-3xl font-semibold">Retornos</h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-[#5d5248]">
-              O que precisa de contato agora: atrasados, hoje e proximos.
+              O que precisa de retorno agora: vendas e acompanhamentos pos-venda.
             </p>
           </div>
 
@@ -122,10 +122,10 @@ function contactToAgendaItem(contact: ContactReturn): AgendaItem {
     patientId: contact.patients?.id ?? null,
     patientName: contact.patients?.name ?? "Paciente removido",
     patientPhone: contact.patients?.phone ?? "Telefone nao disponivel",
-    title: contact.next_action || `Contato por ${contact.channel}`,
+    title: contact.next_action || `Retorno de venda por ${contact.channel}`,
     description: contact.summary,
     scheduledAt: contact.next_contact_at,
-    badge: contactReturnTypeLabels[contact.return_type] ?? "Contato",
+    badge: contact.return_type === "pos_procedimento" ? "Pos-venda" : "Oportunidade / Venda",
   };
 }
 
@@ -154,14 +154,14 @@ function opportunityToAgendaItem(opportunity: OpportunityReturn): AgendaItem {
   return {
     id: opportunity.id,
     type: "opportunity",
-    cardKind: "opportunity",
+    cardKind: "sale",
     patientId: opportunity.patients?.id ?? null,
     patientName: opportunity.patients?.name ?? "Paciente removido",
     patientPhone: opportunity.patients?.phone ?? "Telefone nao disponivel",
     title: opportunity.suggested_procedure,
     description: opportunityStatusLabels[opportunity.status] ?? opportunity.status,
     scheduledAt: opportunity.expected_return_at,
-    badge: "Oportunidade",
+    badge: "Oportunidade / Venda",
     value:
       opportunity.proposed_value === null
         ? undefined
@@ -280,14 +280,10 @@ function formatDateTime(value: string) {
 
 function getContactCardKind(contact: ContactReturn): AgendaItem["cardKind"] {
   if (contact.return_type === "pos_procedimento") {
-    return "postProcedure";
+    return "postSale";
   }
 
-  if (contact.return_type === "aguardando_retorno" || contact.waiting_patient_response) {
-    return "waiting";
-  }
-
-  return "general";
+  return "sale";
 }
 
 function cardClassName(
@@ -297,15 +293,11 @@ function cardClassName(
   const base = "rounded-lg border p-3 shadow-sm";
   const overdue = columnTone === "danger" ? " ring-1 ring-red-200" : "";
 
-  if (cardKind === "opportunity") {
+  if (cardKind === "sale") {
     return `${base} border-amber-300 bg-amber-50${overdue}`;
   }
 
-  if (cardKind === "waiting") {
-    return `${base} border-sky-300 bg-sky-50${overdue}`;
-  }
-
-  if (cardKind === "postProcedure") {
+  if (cardKind === "postSale") {
     return `${base} border-emerald-300 bg-emerald-50${overdue}`;
   }
 
@@ -315,15 +307,11 @@ function cardClassName(
 function badgeClassName(cardKind: AgendaItem["cardKind"]) {
   const base = "rounded-full px-3 py-1 text-xs font-medium";
 
-  if (cardKind === "opportunity") {
+  if (cardKind === "sale") {
     return `${base} bg-amber-200 text-amber-900`;
   }
 
-  if (cardKind === "waiting") {
-    return `${base} bg-sky-200 text-sky-900`;
-  }
-
-  if (cardKind === "postProcedure") {
+  if (cardKind === "postSale") {
     return `${base} bg-emerald-200 text-emerald-900`;
   }
 
@@ -350,10 +338,4 @@ const opportunityStatusLabels: Record<string, string> = {
   aguardando_retorno: "Aguardando retorno",
   fechada: "Fechada",
   perdida: "Perdida",
-};
-
-const contactReturnTypeLabels: Record<string, string> = {
-  comercial: "Comercial",
-  aguardando_retorno: "Aguardando retorno",
-  pos_procedimento: "Pos-procedimento",
 };

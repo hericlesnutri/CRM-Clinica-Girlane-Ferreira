@@ -60,7 +60,8 @@ export default async function CrmPage() {
           </h2>
           <p className="mt-3 max-w-3xl leading-7 text-[#5d5248]">
             Use este painel como ponto de partida. Para registrar qualquer
-            conversa, proposta ou pos-procedimento, comece por Atender.
+            oportunidade de venda ou acompanhamento pos-venda, comece por
+            Atender.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link
@@ -79,7 +80,7 @@ export default async function CrmPage() {
               className="inline-flex h-10 items-center rounded-lg border border-[#dfd7cc] px-4 text-sm font-semibold transition hover:bg-[#f5f3e7]"
               href="/crm/oportunidades"
             >
-              Ver oportunidades
+              Ver vendas
             </Link>
             <Link
               className="inline-flex h-10 items-center rounded-lg border border-[#dfd7cc] px-4 text-sm font-semibold transition hover:bg-[#f5f3e7]"
@@ -106,7 +107,7 @@ export default async function CrmPage() {
           />
           <MetricCard
             icon={<PhoneCall aria-hidden className="size-5" />}
-            label="Contatos registrados"
+            label="Acompanhamentos"
             value={String(contactsCount ?? 0)}
           />
           <MetricCard

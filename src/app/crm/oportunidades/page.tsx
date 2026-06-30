@@ -86,9 +86,9 @@ export default async function OpportunitiesPage() {
             <Link className="text-sm font-medium text-[#9e7f60]" href="/crm">
               Voltar ao painel
             </Link>
-            <h1 className="mt-2 text-3xl font-semibold">Oportunidades</h1>
+            <h1 className="mt-2 text-3xl font-semibold">Oportunidades / vendas</h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-[#5d5248]">
-              Veja propostas, retornos e vendas em colunas simples.
+              Veja leads, propostas, retornos e vendas em colunas simples.
             </p>
           </div>
 
@@ -96,12 +96,12 @@ export default async function OpportunitiesPage() {
             className="inline-flex h-10 items-center justify-center rounded-lg bg-[#333333] px-4 text-sm font-semibold text-[#f5f3e7] transition hover:bg-[#4a4037]"
             href="/crm/atendimento"
           >
-            Nova oportunidade
+            Nova venda
           </Link>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
-          <SummaryCard label="Oportunidades" value={String(items.length)} />
+          <SummaryCard label="Oportunidades / vendas" value={String(items.length)} />
           <SummaryCard label="Valor em aberto" value={formatCurrency(openValue)} />
           <SummaryCard label="Valor fechado" value={formatCurrency(wonValue)} />
         </div>

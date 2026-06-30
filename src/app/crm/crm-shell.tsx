@@ -36,7 +36,7 @@ const primaryNavItems = [
   { href: "/crm", icon: LayoutDashboard, label: "Inicio" },
   { href: "/crm/atendimento", icon: UserRoundPlus, label: "Atender" },
   { href: "/crm/agenda", icon: CalendarDays, label: "Retornos" },
-  { href: "/crm/oportunidades", icon: Sparkles, label: "Oportunidades" },
+  { href: "/crm/oportunidades", icon: Sparkles, label: "Vendas" },
   { href: "/crm/pacientes", icon: UsersRound, label: "Pacientes" },
 ];
 

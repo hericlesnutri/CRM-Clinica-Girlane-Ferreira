@@ -37,8 +37,8 @@ export default async function CommercialDeskPage({
             </Link>
             <h1 className="mt-2 text-3xl font-semibold">Atender</h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-[#5d5248]">
-              Cadastre paciente, conversa, oportunidade ou pos-procedimento em
-              uma unica tela.
+              Cadastre paciente, oportunidade de venda ou acompanhamento
+              pos-venda em uma unica tela.
             </p>
           </div>
 
@@ -60,9 +60,9 @@ export default async function CommercialDeskPage({
 
 const successMessages: Record<string, string> = {
   paciente: "Paciente cadastrado com sucesso.",
-  contato: "Contato registrado com sucesso.",
-  oportunidade: "Oportunidade registrada com sucesso.",
-  pos_procedimento: "Sequencia de acompanhamento pos-procedimento criada com sucesso.",
+  contato: "Acompanhamento registrado com sucesso.",
+  oportunidade: "Oportunidade de venda registrada com sucesso.",
+  pos_procedimento: "Acompanhamento pos-venda criado com sucesso.",
 };
 
 function SuccessMessage({

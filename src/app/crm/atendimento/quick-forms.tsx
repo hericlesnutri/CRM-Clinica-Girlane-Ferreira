@@ -13,13 +13,13 @@ type PatientOption = {
   phone: string;
 };
 
-type RecordType = "contato" | "oportunidade" | "pos_procedimento";
+type RecordType = "oportunidade" | "pos_procedimento";
 
 const initialState: QuickActionState = {};
 
 export function QuickForms({ patients }: { patients: PatientOption[] }) {
   const [phone, setPhone] = useState("");
-  const [recordType, setRecordType] = useState<RecordType>("contato");
+  const [recordType, setRecordType] = useState<RecordType>("oportunidade");
   const [patientState, patientAction, isPatientPending] = useActionState(
     createQuickPatient,
     initialState,
@@ -35,7 +35,7 @@ export function QuickForms({ patients }: { patients: PatientOption[] }) {
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#9e7f60]">
-              Primeiro contato
+              Novo paciente
             </p>
             <h2 className="mt-1 text-xl font-semibold">Cadastrar paciente</h2>
           </div>
@@ -98,23 +98,17 @@ export function QuickForms({ patients }: { patients: PatientOption[] }) {
             </p>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-3">
-            <TypeButton
-              active={recordType === "contato"}
-              description="Conversa, WhatsApp, ligacao ou retorno simples."
-              label="Contato"
-              onClick={() => setRecordType("contato")}
-            />
+          <div className="grid gap-3 md:grid-cols-2">
             <TypeButton
               active={recordType === "oportunidade"}
-              description="Proposta, valor e status de negociacao."
-              label="Oportunidade"
+              description="Lead, agendamento, proposta, valor ou negociacao."
+              label="Oportunidade / Venda"
               onClick={() => setRecordType("oportunidade")}
             />
             <TypeButton
               active={recordType === "pos_procedimento"}
-              description="Sequencia de cuidado na recuperacao."
-              label="Pos-procedimento"
+              description="Acompanhamento depois de um procedimento realizado."
+              label="Pos-venda / Acompanhamento"
               onClick={() => setRecordType("pos_procedimento")}
             />
           </div>
@@ -122,7 +116,6 @@ export function QuickForms({ patients }: { patients: PatientOption[] }) {
           <input name="record_type" type="hidden" value={recordType} />
           <PatientSelect patients={patients} />
 
-          {recordType === "contato" ? <ContactFields /> : null}
           {recordType === "oportunidade" ? <OpportunityFields /> : null}
           {recordType === "pos_procedimento" ? <PostProcedureFields /> : null}
 
@@ -138,69 +131,6 @@ export function QuickForms({ patients }: { patients: PatientOption[] }) {
         </div>
       )}
     </div>
-  );
-}
-
-function ContactFields() {
-  return (
-    <>
-      <div className="grid gap-4 md:grid-cols-3">
-        <label className="flex flex-col gap-2 text-sm font-medium">
-          Canal
-          <select className={fieldClassName} name="channel" required defaultValue="">
-            <option disabled value="">
-              Selecione
-            </option>
-            <option value="WhatsApp">WhatsApp</option>
-            <option value="Ligacao">Ligacao</option>
-            <option value="Instagram">Instagram</option>
-            <option value="Presencial">Presencial</option>
-            <option value="Outro">Outro</option>
-          </select>
-        </label>
-
-        <label className="flex flex-col gap-2 text-sm font-medium">
-          Tipo do retorno
-          <select className={fieldClassName} name="return_type" defaultValue="comercial">
-            <option value="comercial">Comercial geral</option>
-            <option value="aguardando_retorno">Aguardando retorno</option>
-            <option value="pos_procedimento">Pos-procedimento</option>
-          </select>
-        </label>
-
-        <label className="flex flex-col gap-2 text-sm font-medium">
-          Proximo contato
-          <input className={fieldClassName} name="next_contact_at" type="datetime-local" />
-        </label>
-      </div>
-
-      <label className="flex flex-col gap-2 text-sm font-medium">
-        O que foi conversado
-        <textarea
-          className={`${fieldClassName} min-h-28 py-3`}
-          name="summary"
-          placeholder="Resumo da conversa, interesse, orientacoes e combinados..."
-          required
-        />
-      </label>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <label className="flex flex-col gap-2 text-sm font-medium">
-          Objecao
-          <input className={fieldClassName} name="patient_objection" />
-        </label>
-
-        <label className="flex flex-col gap-2 text-sm font-medium">
-          Proxima acao
-          <input className={fieldClassName} name="next_action" />
-        </label>
-      </div>
-
-      <label className="flex items-center gap-3 rounded-lg border border-[#dfd7cc] bg-[#f5f3e7] px-4 py-3 text-sm font-medium">
-        <input className="size-4 accent-[#9e7f60]" name="waiting_patient_response" type="checkbox" />
-        Aguardando retorno do paciente
-      </label>
-    </>
   );
 }
 
@@ -416,9 +346,8 @@ const buttonClassName =
   "h-11 rounded-lg bg-[#333333] px-5 font-semibold text-[#f5f3e7] transition hover:bg-[#4a4037] disabled:cursor-not-allowed disabled:opacity-70 md:w-fit";
 
 const submitLabelByType: Record<RecordType, string> = {
-  contato: "Salvar contato",
-  oportunidade: "Salvar oportunidade",
-  pos_procedimento: "Criar sequencia pos-procedimento",
+  oportunidade: "Salvar oportunidade / venda",
+  pos_procedimento: "Criar acompanhamento pos-venda",
 };
 
 function commercialFormClassName(recordType: RecordType) {

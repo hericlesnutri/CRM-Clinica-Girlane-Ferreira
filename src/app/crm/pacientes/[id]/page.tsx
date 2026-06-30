@@ -57,9 +57,9 @@ const opportunityStatusLabels: Record<string, string> = {
 };
 
 const contactReturnTypeLabels: Record<string, string> = {
-  comercial: "Comercial",
-  aguardando_retorno: "Aguardando retorno",
-  pos_procedimento: "Pos-procedimento",
+  comercial: "Oportunidade / Venda",
+  aguardando_retorno: "Oportunidade / Venda",
+  pos_procedimento: "Pos-venda",
 };
 
 export default async function PatientDetailsPage({
@@ -182,7 +182,7 @@ export default async function PatientDetailsPage({
 
         <section className="rounded-lg border border-[#dfd7cc] bg-white">
           <div className="border-b border-[#dfd7cc] px-5 py-4">
-            <h2 className="font-semibold">Oportunidades e propostas</h2>
+            <h2 className="font-semibold">Oportunidades / vendas</h2>
           </div>
 
           {opportunities?.length ? (
@@ -193,14 +193,14 @@ export default async function PatientDetailsPage({
             </div>
           ) : (
             <div className="px-5 py-10 text-center text-sm text-[#5d5248]">
-              Nenhuma oportunidade registrada para este paciente.
+              Nenhuma oportunidade ou venda registrada para este paciente.
             </div>
           )}
         </section>
 
         <section className="rounded-lg border border-[#dfd7cc] bg-white">
           <div className="border-b border-[#dfd7cc] px-5 py-4">
-            <h2 className="font-semibold">Historico de contatos</h2>
+            <h2 className="font-semibold">Historico de acompanhamentos</h2>
           </div>
 
           {contactLogs?.length ? (
@@ -217,7 +217,7 @@ export default async function PatientDetailsPage({
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="font-semibold">{contact.channel}</p>
                         <span className={contactBadgeClassName(contact)}>
-                          {contactReturnTypeLabels[contact.return_type] ?? "Comercial"}
+                          {contactReturnTypeLabels[contact.return_type] ?? "Oportunidade / Venda"}
                         </span>
                       </div>
                       <p className="mt-1 text-sm text-[#5d5248]">
@@ -227,7 +227,7 @@ export default async function PatientDetailsPage({
                     </div>
                     {contact.waiting_patient_response ? (
                       <span className="w-fit rounded-full bg-[#dfd7cc] px-3 py-1 text-xs font-medium text-[#333333]">
-                        Aguardando retorno
+                        Aguardando paciente
                       </span>
                     ) : null}
                   </div>
@@ -269,7 +269,7 @@ export default async function PatientDetailsPage({
             </div>
           ) : (
             <div className="px-5 py-10 text-center text-sm text-[#5d5248]">
-              Nenhum contato registrado para este paciente.
+              Nenhum acompanhamento registrado para este paciente.
             </div>
           )}
         </section>
@@ -387,11 +387,7 @@ function contactCardClassName(contact: ContactLog) {
     return `${base} border-emerald-300 bg-emerald-50`;
   }
 
-  if (contact.return_type === "aguardando_retorno" || contact.waiting_patient_response) {
-    return `${base} border-sky-300 bg-sky-50`;
-  }
-
-  return `${base} border-[#dfd7cc] bg-white`;
+  return `${base} border-amber-300 bg-amber-50`;
 }
 
 function contactBadgeClassName(contact: ContactLog) {
@@ -401,9 +397,5 @@ function contactBadgeClassName(contact: ContactLog) {
     return `${base} bg-emerald-200 text-emerald-900`;
   }
 
-  if (contact.return_type === "aguardando_retorno" || contact.waiting_patient_response) {
-    return `${base} bg-sky-200 text-sky-900`;
-  }
-
-  return `${base} bg-[#dfd7cc] text-[#333333]`;
+  return `${base} bg-amber-200 text-amber-900`;
 }

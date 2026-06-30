@@ -35,15 +35,15 @@ export function ContactForm({ patientId }: { patientId: string }) {
         </label>
 
         <label className="flex flex-col gap-2 text-sm font-medium">
-          Tipo do retorno
+          Tipo de acompanhamento
           <select
             className="h-11 rounded-lg border border-[#dfd7cc] bg-white px-3 outline-none transition focus:border-[#9e7f60] focus:ring-2 focus:ring-[#dfd7cc]"
             name="return_type"
             defaultValue="comercial"
           >
-            <option value="comercial">Comercial geral</option>
-            <option value="aguardando_retorno">Aguardando retorno</option>
-            <option value="pos_procedimento">Pos-procedimento</option>
+            <option value="comercial">Oportunidade / Venda</option>
+            <option value="aguardando_retorno">Oportunidade / Venda</option>
+            <option value="pos_procedimento">Pos-venda</option>
           </select>
         </label>
 
@@ -107,7 +107,7 @@ export function ContactForm({ patientId }: { patientId: string }) {
         disabled={isPending}
         type="submit"
       >
-        {isPending ? "Registrando..." : "Registrar contato"}
+        {isPending ? "Registrando..." : "Registrar acompanhamento"}
       </button>
     </form>
   );

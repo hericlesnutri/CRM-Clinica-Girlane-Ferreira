@@ -97,8 +97,7 @@ export default async function ReportsPage() {
             </Link>
             <h1 className="mt-2 text-3xl font-semibold">Relatorios comerciais</h1>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-[#5d5248]">
-              Visao rapida de propostas, contatos, retornos e movimentacao do
-              mes.
+              Visao rapida de vendas, acompanhamentos e movimentacao do mes.
             </p>
           </div>
 
@@ -106,7 +105,7 @@ export default async function ReportsPage() {
             className="inline-flex h-10 items-center justify-center rounded-lg bg-[#333333] px-4 text-sm font-semibold text-[#f5f3e7] transition hover:bg-[#4a4037]"
             href="/crm/oportunidades"
           >
-            Abrir funil
+            Abrir vendas
           </Link>
         </div>
 
@@ -125,12 +124,12 @@ export default async function ReportsPage() {
         <div className="grid gap-4 md:grid-cols-4">
           <MetricCard label="Pacientes" value={String(patientsCount ?? 0)} />
           <MetricCard label="Procedimentos registrados" value={String(proceduresCount ?? 0)} />
-          <MetricCard label="Contatos hoje" value={String(todayContacts.length)} />
-          <MetricCard label="Contatos no mes" value={String(monthContacts.length)} />
+          <MetricCard label="Acompanhamentos hoje" value={String(todayContacts.length)} />
+          <MetricCard label="Acompanhamentos no mes" value={String(monthContacts.length)} />
         </div>
 
         <div className="grid gap-4 lg:grid-cols-3">
-          <ReportPanel title="Oportunidades por etapa">
+          <ReportPanel title="Oportunidades / vendas por etapa">
             {Object.entries(opportunityStatusLabels).map(([status, label]) => {
               const statusItems = opportunityItems.filter(
                 (opportunity) => opportunity.status === status,
@@ -148,7 +147,7 @@ export default async function ReportsPage() {
             })}
           </ReportPanel>
 
-          <ReportPanel title="Contatos por canal">
+          <ReportPanel title="Acompanhamentos por canal">
             {groupBy(contactItems, "channel").map((item) => (
               <ReportLine key={item.label} label={item.label} value={String(item.count)} />
             ))}
@@ -156,16 +155,16 @@ export default async function ReportsPage() {
 
           <ReportPanel title="Movimento do mes">
             <ReportLine
-              label="Oportunidades criadas"
+              label="Oportunidades / vendas criadas"
               value={String(monthOpportunities.length)}
             />
             <ReportLine
               label="Valor criado"
               value={formatCurrency(sumOpportunityValue(monthOpportunities))}
             />
-            <ReportLine label="Contatos realizados" value={String(monthContacts.length)} />
+            <ReportLine label="Acompanhamentos realizados" value={String(monthContacts.length)} />
             <ReportLine
-              label="Pos-procedimento"
+              label="Pos-venda"
               value={String(
                 monthContacts.filter((contact) => contact.return_type === "pos_procedimento")
                   .length,
