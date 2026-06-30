@@ -56,7 +56,7 @@ export function PatientsList({ patients }: { patients: Patient[] }) {
             <article key={patient.id} className="grid gap-3 px-5 py-4 transition hover:bg-[#fff8f2] md:grid-cols-[1.2fr_1fr_1fr]">
               <div>
                 <Link
-                  className="font-semibold transition hover:text-[#9e7f60]"
+                  className="inline-flex rounded-md text-base font-semibold text-[#2f2824] transition hover:text-[#c96f61] focus:outline-none focus:ring-2 focus:ring-[#f1c9bf]"
                   href={`/crm/pacientes/${patient.id}`}
                 >
                   {patient.name}
@@ -80,14 +80,6 @@ export function PatientsList({ patients }: { patients: Patient[] }) {
                   {patient.notes}
                 </p>
               ) : null}
-              <div className="md:col-span-3">
-                <Link
-                  className="inline-flex h-9 items-center rounded-lg border border-[#dfd7cc] px-3 text-sm font-medium transition hover:bg-[#f5f3e7]"
-                  href={`/crm/pacientes/${patient.id}`}
-                >
-                  Abrir ficha
-                </Link>
-              </div>
             </article>
           ))}
         </div>
